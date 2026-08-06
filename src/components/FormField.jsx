@@ -22,10 +22,11 @@ export default function FormField({
 
   return (
     <div className='flex flex-col gap-1.5'>
-      <label htmlFor={name} className='text-sm font-medium text-(--text-h)'>
+      {/* made the form label slightly more bold and gave them a softer color */}
+      <label htmlFor={name} className='text-sm font-semibold text-[#d8d3e6]'>
         {label}
       </label>
-
+    {/* Changed className to give each input a dark translucent background, a purple focus state, makes placeholder text new color to fit style, larger corners, more padding, and white typed text */}
       <input
         id={name}
         name={name}
@@ -34,9 +35,9 @@ export default function FormField({
         onChange={onChange}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
-        className={`w-full rounded-md border bg-transparent px-3 py-2 outline-none transition
-          focus:border-(--accent) focus:ring-2 focus:ring-(--accent-bg)
-          ${error ? 'border-red-500' : 'border-(--border)'}`}
+        className={`w-full rounded-xl border bg-[#17141f]/70 px-4 py-3 text-sm text-white placeholder:text-[#777087] outline-none transition
+          focus:border-violet-400 focus:ring-2 focus:ring-violet-500/20
+          ${error ? 'border-red-500' : 'border-white/10'}`}
         {...inputProps}
       />
 
