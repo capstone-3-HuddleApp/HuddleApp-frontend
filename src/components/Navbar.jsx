@@ -16,33 +16,29 @@ export default function Navbar({ user, onLogout }) {
     <header className='border-b border-(--border)'>
       <nav className='mx-auto flex max-w-3xl items-center gap-2 px-4 py-3'>
         <NavLink
-          to='/'
+          to='/' end
           className='mr-auto text-lg font-semibold text-(--text-h)'
         >
-          Capstone
+          Huddle
         </NavLink>
 
         {/* `end` makes "Home" active only on "/" exactly, not on every route. */}
-        {(!user) && <NavLink to='/' end className={linkClass}>
-          Home
-        </NavLink>}
-
-
-        {/* Only show the protected link once someone is logged in. */}
-        {user && (
-          <NavLink to='/protected' className={linkClass}>
-            Protected
-          </NavLink>
-        )}
+        {/* {(!user) && <NavLink to='/' end className={linkClass}>
+          
+        </NavLink>} */}
 
         {/* Auth controls: your name + Log out, or the Log in / Sign up pair. */}
         {user ? (
           <>
-            <span className='px-2 text-sm'>
-              {/* Our own users always have a username; Auth0 users may also
-                  have a name or email worth falling back to. */}
-              {user.username || user.name || user.email}
+           {/* 
+                       <span className='px-2 text-sm'>
+              Our own users always have a username; Auth0 users may also
+                  have a name or email worth falling back to.
+              user.username || user.name || user.email
             </span>
+           */}
+
+
             <button
               onClick={onLogout}
               className='rounded-md px-3 py-2 text-sm font-medium hover:text-(--text-h)'

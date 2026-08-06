@@ -23,7 +23,7 @@ export default function Layout({ user, onLogout, authError }) {
         )}
         <Outlet />
       </main>
-      {(!user) && <Footer user={user}></Footer>}
+      {(user) && <Footer user={user}></Footer>}
     </div>
   );
 }
