@@ -4,14 +4,14 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
-import TasksPage from './pages/TasksPage';
-import TaskDetailPage from './pages/TaskDetailPage';
+// import TasksPage from './pages/TasksPage';
+// import TaskDetailPage from './pages/TaskDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedPage from './pages/ProtectedPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import { getMe, syncUser, logoutRequest } from './api/auth';
+import { getMe, syncUser, logoutRequest, signup } from './api/auth';
 
 // App does two things:
 //   1. maps every URL to a page
@@ -137,15 +137,15 @@ function App() {
           <Layout user={user} onLogout={handleLogout} authError={authError} />
         }
       >
-        <Route path='/' element={<HomePage />} />
+        <Route path='/' element={<HomePage onSignup={Signup} onLogin={Login}/>} />
 
         {/* Public on purpose: you can reach these while logged OUT.
             They get setUser so they can report a successful login back up. */}
         <Route path='/login' element={<Login setUser={setUser} />} />
         <Route path='/signup' element={<Signup setUser={setUser} />} />
 
-        <Route path='/tasks' element={<TasksPage />} />
-        <Route path='/tasks/:id' element={<TaskDetailPage />} />
+        {/* <Route path='/tasks' element={<TasksPage />} /> */}
+        {/* <Route path='/tasks/:id' element={<TaskDetailPage />} /> */}
 
         {/* Only reachable when logged in — ProtectedRoute redirects otherwise. */}
         <Route

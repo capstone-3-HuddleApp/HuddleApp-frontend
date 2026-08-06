@@ -23,12 +23,10 @@ export default function Navbar({ user, onLogout }) {
         </NavLink>
 
         {/* `end` makes "Home" active only on "/" exactly, not on every route. */}
-        <NavLink to='/' end className={linkClass}>
+        {(!user) && <NavLink to='/' end className={linkClass}>
           Home
-        </NavLink>
-        <NavLink to='/tasks' className={linkClass}>
-          Tasks
-        </NavLink>
+        </NavLink>}
+
 
         {/* Only show the protected link once someone is logged in. */}
         {user && (
