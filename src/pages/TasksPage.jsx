@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { getTasks, createTask, updateTask, deleteTask } from '../api/tasks';
+import { getTasks, createTask, updateTask, deleteTask } from '../api/events';
 
 // This page shows the full CRUD loop against the backend:
 // read the list, create a task, toggle it done, and delete it.
