@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router";
+import { useAuth0 } from "@auth0/auth0-react";
 
-import Layout from './components/Layout';
-import HomePage from './pages/HomePage';
+import Layout from "./components/Layout";
+import HomePage from "./pages/HomePage";
 // import TasksPage from './pages/TasksPage';
 // import TaskDetailPage from './pages/TaskDetailPage';
-import NotFoundPage from './pages/NotFoundPage';
-import ProtectedPage from './pages/ProtectedPage';
-import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import { getMe, syncUser, logoutRequest} from './api/auth';
+import NotFoundPage from "./pages/NotFoundPage";
+import ProtectedPage from "./pages/ProtectedPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import { getMe, syncUser, logoutRequest } from "./api/auth";
+import CreateEventPage from "./pages/CreateEventPage";
 
 // App does two things:
 //   1. maps every URL to a page
@@ -53,9 +54,7 @@ function App() {
   // below, there'd be a window where nothing is "loading" but nobody is logged
   // in either — and that window is exactly when the redirect fires.
   const isLoading =
-    isCheckingSession ||
-    isAuth0Loading ||
-    (isAuth0User && !user && !authError);
+    isCheckingSession || isAuth0Loading || (isAuth0User && !user && !authError);
 
   // ---------- 1. on page load: are we already logged in? ----------
   // Our JWT lives in an httpOnly cookie. That cookie survives a refresh, but
@@ -91,7 +90,7 @@ function App() {
           // Auth0 gives us a nickname; fall back to the email's local part.
           // It's only a SUGGESTION — the backend adjusts it if that username
           // is taken or too short, and tells us what it actually used.
-          username: auth0User.nickname || auth0User.email?.split('@')[0],
+          username: auth0User.nickname || auth0User.email?.split("@")[0],
         });
         setUser(dbUser);
         setAuthError(null);
@@ -118,7 +117,7 @@ function App() {
     } catch (error) {
       // Even if the request fails, still drop the user locally — staying
       // "logged in" on screen after clicking Log out is the worse outcome.
-      console.error('Logout failed:', error.message);
+      console.error("Logout failed:", error.message);
     }
 
     setUser(null);
@@ -137,28 +136,33 @@ function App() {
           <Layout user={user} onLogout={handleLogout} authError={authError} />
         }
       >
-        <Route path='/' element={<HomePage/>} />
+        <Route path="/" element={<HomePage />} />
 
         {/* Public on purpose: you can reach these while logged OUT.
             They get setUser so they can report a successful login back up. */}
-        <Route path='/login' element={<Login setUser={setUser} />} />
-        <Route path='/signup' element={<Signup setUser={setUser} />} />
+        <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/signup" element={<Signup setUser={setUser} />} />
 
         {/* <Route path='/tasks' element={<TasksPage />} /> */}
         {/* <Route path='/tasks/:id' element={<TaskDetailPage />} /> */}
 
         {/* Only reachable when logged in — ProtectedRoute redirects otherwise. */}
         <Route
-          path='/protected'
+          path="/protected"
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
               <ProtectedPage user={user} />
             </ProtectedRoute>
           }
         />
+        <Route path="/events/create"element={
+          <ProtectedRoute user={user} isLoading={isLoading}>
+            <CreateEventPage user={user}></CreateEventPage>
+          </ProtectedRoute>
+        }></Route>
 
         {/* '*' matches anything no other route claimed. Keep it LAST. */}
-        <Route path='*' element={<NotFoundPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );

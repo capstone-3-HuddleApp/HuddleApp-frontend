@@ -1,4 +1,9 @@
 import { NavLink } from "react-router";
+import createIcon from '../assets/interface_icons/createIcon.png'
+import mapIcon from '../assets/interface_icons/mapIcon.svg'
+import messageIcon from '../assets/interface_icons/messageIcon.svg'
+import search from '../assets/interface_icons/search.svg'
+import user from '../assets/interface_icons/user.svg'
 
 /**
  * $$$-Method Creation: 07/08/2026, [Md Shamin Ahsan Anaph]
@@ -44,33 +49,33 @@ export default function Footer() {
         {/* Discover route, navigates to the discover events page */}
         <span className={footerIContClass}>
           <NavLink className={linkClass} to='/protected'>
-            <img src="src\assets\interface_icons\search.svg" alt="" />
+            <img src={search} alt="" />
           </NavLink>
           <p className="font-bold text-xs">Discover</p>
         </span>
 
         <span className={footerIContClass}>
           <NavLink className={linkClass}>
-            <img src="src\assets\interface_icons\mapIcon.svg" alt="" />
+            <img src={mapIcon} alt="" />
           </NavLink>
           <p className={footerTextClass}>Map</p>
         </span>
 
         {/* Create event route, navigates to the create event page*/}
-          <NavLink className={`${footerCreatebtn} -translate-y-10`}>
-            <img className="rotate-45" src="src\assets\interface_icons\createIcon.png" alt="" />
+          <NavLink to='/events/create' className={`${footerCreatebtn} -translate-y-10`}>
+            <img className="rotate-45" src={createIcon} alt="" />
           </NavLink>
 
 
         <span className={footerIContClass}>
           <NavLink className={linkClass}>
-            <img src="src\assets\interface_icons\messageIcon.svg" alt="" />
+            <img src={messageIcon} alt="" />
           </NavLink>
           <p className={footerTextClass}>Chat</p>
         </span>
         <span className={footerIContClass}>
           <NavLink className={linkClass}>
-            <img src="src\assets\interface_icons\user.svg" alt="" />
+            <img src={user} alt="" />
           </NavLink>
           <p className={footerTextClass}>Profile</p>
         </span>

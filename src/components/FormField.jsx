@@ -10,9 +10,10 @@
 //   aria-describedby  — points the screen reader at the error text, so the user
 //                       hears WHAT is wrong, not only that something is.
 export default function FormField({
+  className = "",
   label,
   name,
-  type = 'text',
+  type = "text",
   value,
   onChange,
   error,
@@ -21,12 +22,12 @@ export default function FormField({
   const errorId = `${name}-error`;
 
   return (
-    <div className='flex flex-col gap-1.5'>
+    <div className={`${className} flex flex-col gap-1.5`}>
       {/* made the form label slightly more bold and gave them a softer color */}
-      <label htmlFor={name} className='text-sm font-semibold text-[#d8d3e6]'>
+      <label htmlFor={name} className="text-sm font-semibold text-[#d8d3e6]">
         {label}
       </label>
-    {/* Changed className to give each input a dark translucent background, a purple focus state, makes placeholder text new color to fit style, larger corners, more padding, and white typed text */}
+      {/* Changed className to give each input a dark translucent background, a purple focus state, makes placeholder text new color to fit style, larger corners, more padding, and white typed text */}
       <input
         id={name}
         name={name}
@@ -35,15 +36,15 @@ export default function FormField({
         onChange={onChange}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
-        className={`w-full rounded-xl border bg-[#17141f]/70 px-4 py-3 text-sm text-white placeholder:text-[#777087] outline-none transition
+        className={`w-full rounded-xl border h-full bg-[#B8B8FF]/20 px-4 py-3 text-sm text-white placeholder:text-[#777087] outline-none transition
           focus:border-violet-400 focus:ring-2 focus:ring-violet-500/20
-          ${error ? 'border-red-500' : 'border-white/10'}`}
+          ${error ? "border-red-500" : "border-white/10"}`}
         {...inputProps}
       />
 
       {/* role="alert" makes a screen reader announce the message the moment it appears. */}
       {error && (
-        <span id={errorId} role='alert' className='text-sm text-red-500'>
+        <span id={errorId} role="alert" className="text-sm text-red-500">
           {error}
         </span>
       )}
