@@ -115,7 +115,7 @@ function Login({ setUser }) {
           className='flex flex-col gap-4'
         >
           <FormField
-            label='Email'
+            label='Email or username'
             name='identifier'
             placeholder='you@example.com'
             autoComplete='username'
@@ -163,7 +163,7 @@ function Login({ setUser }) {
           Continue with Auth0
         </button>
 
-        {/* changed classname so that Log In text is purple and when hovering a link shows and turns violet to emphasize you are hovering it */}
+        {/* changed classname so that signup text is purple and when hovering a link shows and turns violet to emphasize you are hovering it */}
         <p className='mt-6 text-center text-sm text-[#aaa3bd]'>
           Don't have an account?{' '}
           <Link
