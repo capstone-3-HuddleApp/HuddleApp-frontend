@@ -1,69 +1,55 @@
-import { NavLink } from 'react-router';
+import { NavLink } from "react-router";
 
-// NavLink is like an <a> tag but for client-side routing: it navigates without
-// a full page reload, and it tells us when its route is active so we can style it.
-//
-// Navbar takes `user` and `onLogout` as props from App. It doesn't fetch
-// anything or know how you logged in — it just renders what it's handed. A
-// component this simple is easy to reason about and easy to reuse.
+/**
+ * $$$-Method Creation: 07/08/2026, [Md Shamin Ahsan Anaph]
+ * $$$-Most Recent Change: 07/08/2026, [Md Shamin Ahsan Anaph]
+ * $$$-Method Description:
+ *    Renders the bottom navigation bar. Shows different links
+ * $$$-Functions Using This Method: 
+ *    none — this is the top-level exported component, 
+ * rendered by Layout
+ * $$$-Description of Variables: 
+ *    Repeating class styles grouped into class variables
+ *
+ * */
 export default function Footer({ user, onLogout }) {
   const linkClass = ({ isActive }) =>
     `px-3 py-2 rounded-md text-sm font-medium ${
-      isActive ? 'text-(--accent)' : 'hover:text-(--text-h)'
+      isActive ? "text-(--accent)" : "hover:text-(--text-h)"
     }`;
 
+  const footerIContClass = "flex flex-col items-center";
+  const footerIconClass = "w-10 bg-white rounded-full p-2";
+  const footerTextClass = "font-bold text-xs";
+
   return (
-    <header className='border-b border-(--border)'>
-      <nav className='mx-auto flex max-w-3xl items-center gap-2 px-4 py-3'>
-        <NavLink
-          to='/'
-          className='mr-auto text-lg font-semibold text-(--text-h)'
-        >
-          Capstone
-        </NavLink>
-
-        {/* `end` makes "Home" active only on "/" exactly, not on every route. */}
-        {(!user) && <NavLink to='/' end className={linkClass}>
-          Home
-        </NavLink>}
-
-
-        {/* Only show the protected link once someone is logged in. */}
-        {user && (
-          <NavLink to='/protected' className={linkClass}>
-            Protected
+    <footer className="border-b border-(--border) bg-black border-2 border-b-blue-50">
+      <nav className="mx-auto flex flex-row max-w-3xl items-center justify-evenly gap-2 px-4 py-3">
+        <span className={footerIContClass}>
+          <NavLink className="w-10 bg-white rounded-full p-2">
+            <img src="src\assets\interface_icons\search.svg" alt="" />
           </NavLink>
-        )}
-
-        {/* Auth controls: your name + Log out, or the Log in / Sign up pair. */}
-        {user ? (
-          <>
-            <span className='px-2 text-sm'>
-              {/* Our own users always have a username; Auth0 users may also
-                  have a name or email worth falling back to. */}
-              {user.username || user.name || user.email}
-            </span>
-            <button
-              onClick={onLogout}
-              className='rounded-md px-3 py-2 text-sm font-medium hover:text-(--text-h)'
-            >
-              Log out
-            </button>
-          </>
-        ) : (
-          <>
-            <NavLink to='/login' className={linkClass}>
-              Log in
-            </NavLink>
-            <NavLink
-              to='/signup'
-              className='rounded-md bg-(--accent) px-3 py-2 text-sm font-medium text-white'
-            >
-              Sign up
-            </NavLink>
-          </>
-        )}
+          <p className="font-bold text-xs">Discover</p>
+        </span>
+        <span className={footerIContClass}>
+          <NavLink className={footerIconClass}>
+            <img src="src\assets\interface_icons\mapIcon.svg" alt="" />
+          </NavLink>
+          <p className={footerTextClass}>Map</p>
+        </span>
+        <span className={footerIContClass}>
+          <NavLink className={footerIconClass}>
+            <img src="src\assets\interface_icons\messageIcon.svg" alt="" />
+          </NavLink>
+          <p className={footerTextClass}>Chat</p>
+        </span>
+        <span className={footerIContClass}>
+          <NavLink className={footerIconClass}>
+            <img src="src\assets\interface_icons\user.svg" alt="" />
+          </NavLink>
+          <p className={footerTextClass}>Profile</p>
+        </span>
       </nav>
-    </header>
+    </footer>
   );
 }
