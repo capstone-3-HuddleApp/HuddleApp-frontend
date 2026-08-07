@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { getProtected } from '../api/auth';
+import { getEvents } from '../api/events';
 
 // A page to TEST the protected backend endpoint. ProtectedRoute makes sure you
 // can only get here when logged in; the button then calls /api/protected and
@@ -21,6 +22,24 @@ export default function ProtectedPage({ user }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [events, setAllEvents] = useState([]);
+  const [loadEvents, setLoadEvents] = useState(true);
+  const [eventsError, setEventsError] = useState(null);
+
+  // Load all events once, when the page first appears.
+  useEffect(() => {
+    async function loadAllEvents() {
+      try {
+        const allEvents = await getEvents();
+        setAllEvents(allEvents);
+      } catch(err) {
+        setEventsError(err.message);
+      } finally {
+        setLoadEvents(false);
+      }
+    }
+    loadAllEvents();
+  }, []);
 
   async function handleTest() {
     setError(null);
@@ -69,6 +88,17 @@ export default function ProtectedPage({ user }) {
           {JSON.stringify(result, null, 2)}
         </pre>
       )}
+      
+      {loadEvents && <p>Loading Events...</p> } 
+
+      {eventsError && <p>{eventsError}</p>}
+
+      {!loadEvents && !eventsError && (
+        events.map((event) => (
+          <p key={event.id}>{event.name} {event.description} {event.category} {event.time} {event.zipcode}</p> // note: backend event shape - name, description, category, time, address, zipcode, facilities_id
+        ))
+      )}
+
     </section>
   );
 }
