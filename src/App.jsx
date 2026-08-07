@@ -11,7 +11,7 @@ import ProtectedPage from './pages/ProtectedPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import { getMe, syncUser, logoutRequest, signup } from './api/auth';
+import { getMe, syncUser, logoutRequest} from './api/auth';
 
 // App does two things:
 //   1. maps every URL to a page
@@ -137,7 +137,7 @@ function App() {
           <Layout user={user} onLogout={handleLogout} authError={authError} />
         }
       >
-        <Route path='/' element={<HomePage onSignup={Signup} onLogin={Login}/>} />
+        <Route path='/' element={<HomePage/>} />
 
         {/* Public on purpose: you can reach these while logged OUT.
             They get setUser so they can report a successful login back up. */}
