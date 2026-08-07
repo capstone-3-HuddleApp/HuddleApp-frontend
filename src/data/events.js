@@ -1,93 +1,73 @@
-// mock events -- placeholder for real
+// mock events -- upgraded with full details to match Figma and DB schema
 const initialEvents = [
   {
     id: 1,
     title: "Jazz in the Park",
     category: "Music",
-    date: "08/15",
+    emoji: "🎷",
+    date: "Sun, Aug 15",
     time: "6:00 PM",
+    venue: "Marcus Garvey Park",
+    address: "18 Mt Morris Park W, New York, NY",
     price: "Free",
+    description: "Join us for a relaxing evening of live jazz in the amphitheater. Bring a blanket, some snacks, and enjoy performances by local trios and quartets under the stars.",
+    tags: ["Music", "Outdoors", "Community", "Live"],
     attendeeCount: 42,
-    zipCode: "10027",
+    attendeeGoal: 100,
+    organizer: "Harlem Arts Council",
     saved: false
   },
   {
     id: 2,
-    title: "Street Art Walk",
-    category: "Art",
-    date: "08/20",
-    time: "2:00 PM",
+    title: "Farmers & Makers Market",
+    category: "Market",
+    emoji: "🛍",
+    date: "Sun, Aug 10",
+    time: "9:00 AM",
+    venue: "Dolores Park",
+    address: "Dolores St & 18th St, San Francisco, CA",
     price: "Free",
-    attendeeCount: 18,
-    zipCode: "10031",
+    description: "Weekly open-air market featuring 60+ local vendors. Farm-fresh produce, handcrafted goods, artisan food, and live acoustic music throughout the day.",
+    tags: ["Market", "Local", "Organic", "Artisan"],
+    attendeeCount: 312,
+    attendeeGoal: 400,
+    organizer: "Green Roots Collective",
     saved: true
   },
   {
     id: 3,
     title: "Knicks Watch Party",
     category: "Sports",
-    date: "08/18",
+    emoji: "🏀",
+    date: "Fri, Aug 18",
     time: "7:30 PM",
-    price: "Free",
+    venue: "Harlem Tavern",
+    address: "2153 Frederick Douglass Blvd, New York, NY",
+    price: "$10 Credits",
+    description: "Come watch the Knicks game on the big screens! Food and drink specials all night. RSVP guarantees entry and one free appetizer for the table.",
+    tags: ["Sports", "Watch Party", "Drinks", "Indoor"],
     attendeeCount: 65,
-    zipCode: "10027",
+    attendeeGoal: 80,
+    organizer: "NYC Sports Fans",
     saved: false
   },
   {
     id: 4,
-    title: "Food Truck Rally",
-    category: "Food",
-    date: "08/22",
-    time: "12:00 PM",
-    price: "Free",
-    attendeeCount: 120,
-    zipCode: "10029",
-    saved: false
-  },
-  {
-    id: 5,
-    title: "Open Mic Poetry Night",
-    category: "Other",
-    date: "08/16",
-    time: "8:00 PM",
-    price: "Free",
-    attendeeCount: 30,
-    zipCode: "10027",
-    saved: true
-  },
-  {
-    id: 6,
-    title: "Summer Gallery Opening",
+    title: "Street Art Walk",
     category: "Art",
-    date: "07/10",
-    time: "5:00 PM",
+    emoji: "🎨",
+    date: "Tue, Aug 20",
+    time: "2:00 PM",
+    venue: "Graffiti Hall of Fame",
+    address: "106th St & Park Ave, New York, NY",
     price: "Free",
-    attendeeCount: 55,
-    zipCode: "10031",
-    saved: false
-  },
-  {
-    id: 7,
-    title: "5K Fun Run",
-    category: "Sports",
-    date: "07/05",
-    time: "9:00 AM",
-    price: "Free",
-    attendeeCount: 200,
-    zipCode: "10029",
-    saved: false
-  },
-  {
-    id: 8,
-    title: "Rooftop Salsa Night",
-    category: "Music",
-    date: "08/25",
-    time: "9:00 PM",
-    price: "Free",
-    attendeeCount: 80,
-    zipCode: "10031",
-    saved: false
+    description: "A guided walking tour exploring the vibrant street art and murals of East Harlem. Learn about the artists and the history of the neighborhood. Wear comfortable shoes!",
+    tags: ["Art", "Walking", "Culture", "Educational"],
+    attendeeCount: 18,
+    attendeeGoal: 30,
+    organizer: "NYC Street Art Tours",
+    saved: true
   }
-]
+];
 
-export { initialEvents }
+export { initialEvents };

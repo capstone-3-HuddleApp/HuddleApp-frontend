@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import TasksPage from './pages/TasksPage';
-import TaskDetailPage from './pages/TaskDetailPage';
+import EventDetailPage from './pages/EventDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedPage from './pages/ProtectedPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -132,6 +132,7 @@ function App() {
   return (
     <Routes>
       {/* Every route below renders inside Layout (navbar + page slot). */}
+      <Route path="/events/:id" element={<EventDetailPage />} />
       <Route
         element={
           <Layout user={user} onLogout={handleLogout} authError={authError} />
@@ -145,7 +146,7 @@ function App() {
         <Route path='/signup' element={<Signup setUser={setUser} />} />
 
         <Route path='/tasks' element={<TasksPage />} />
-        <Route path='/tasks/:id' element={<TaskDetailPage />} />
+        <Route path='/tasks/:id' element={<EventDetailPage />} />
 
         {/* Only reachable when logged in — ProtectedRoute redirects otherwise. */}
         <Route
