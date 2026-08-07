@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
-import { getTask } from '../api/tasks';
+import { getTask } from '../api/events';
 
 // Shows one task. The id comes from the URL, e.g. /tasks/3 -> id === "3".
 export default function TaskDetailPage() {

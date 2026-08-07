@@ -6,7 +6,7 @@ import { NavLink } from 'react-router';
 // Navbar takes `user` and `onLogout` as props from App. It doesn't fetch
 // anything or know how you logged in — it just renders what it's handed. A
 // component this simple is easy to reason about and easy to reuse.
-export default function Navbar({ user, onLogout }) {
+export default function Footer({ user, onLogout }) {
   const linkClass = ({ isActive }) =>
     `px-3 py-2 rounded-md text-sm font-medium ${
       isActive ? 'text-(--accent)' : 'hover:text-(--text-h)'
@@ -16,29 +16,33 @@ export default function Navbar({ user, onLogout }) {
     <header className='border-b border-(--border)'>
       <nav className='mx-auto flex max-w-3xl items-center gap-2 px-4 py-3'>
         <NavLink
-          to='/' end
+          to='/'
           className='mr-auto text-lg font-semibold text-(--text-h)'
         >
-          Huddle
+          Capstone
         </NavLink>
 
         {/* `end` makes "Home" active only on "/" exactly, not on every route. */}
-        {/* {(!user) && <NavLink to='/' end className={linkClass}>
-          
-        </NavLink>} */}
+        {(!user) && <NavLink to='/' end className={linkClass}>
+          Home
+        </NavLink>}
+
+
+        {/* Only show the protected link once someone is logged in. */}
+        {user && (
+          <NavLink to='/protected' className={linkClass}>
+            Protected
+          </NavLink>
+        )}
 
         {/* Auth controls: your name + Log out, or the Log in / Sign up pair. */}
         {user ? (
           <>
-           {/* 
-                       <span className='px-2 text-sm'>
-              Our own users always have a username; Auth0 users may also
-                  have a name or email worth falling back to.
-              user.username || user.name || user.email
+            <span className='px-2 text-sm'>
+              {/* Our own users always have a username; Auth0 users may also
+                  have a name or email worth falling back to. */}
+              {user.username || user.name || user.email}
             </span>
-           */}
-
-
             <button
               onClick={onLogout}
               className='rounded-md px-3 py-2 text-sm font-medium hover:text-(--text-h)'
