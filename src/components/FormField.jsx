@@ -36,7 +36,7 @@ export default function FormField({
         onChange={onChange}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
-        className={`w-full rounded-xl border h-full bg-[#B8B8FF]/20 px-4 py-3 text-sm text-white placeholder:text-[#777087] outline-none transition
+        className={`w-full rounded-xl border h-full bg-[#B8B8FF]/20 px-4 py-3 text-sm text-white text-wrap placeholder:text-[#777087] outline-none transition
           focus:border-violet-400 focus:ring-2 focus:ring-violet-500/20
           ${error ? "border-red-500" : "border-white/10"}`}
         {...inputProps}

@@ -3,7 +3,7 @@ import createIcon from '../assets/interface_icons/createIcon.png'
 import mapIcon from '../assets/interface_icons/mapIcon.svg'
 import messageIcon from '../assets/interface_icons/messageIcon.svg'
 import search from '../assets/interface_icons/search.svg'
-import user from '../assets/interface_icons/user.svg'
+import userIcon from '../assets/interface_icons/user.svg'
 
 /**
  * $$$-Method Creation: 07/08/2026, [Md Shamin Ahsan Anaph]
@@ -17,7 +17,7 @@ import user from '../assets/interface_icons/user.svg'
  *    Repeating class styles grouped into class variables
  *
  * */
-export default function Footer() {
+export default function Footer({user, className=''}) {
 
 
   //Repeating styles grouped together
@@ -43,7 +43,7 @@ export default function Footer() {
     `${footerIconClass} ${isActive ? "bg-blue-300" : "bg-white"}`;
 
   return (
-    <footer className="border-b border-(--border) bg-black border-2 border-b-blue-50">
+    <footer className={`border-b border-(--border) bg-black border-2 border-b-blue-50 h-[10vh] ${className}`}>
       <nav className="mx-auto flex flex-row max-w-3xl items-center justify-center-safe gap-2 px-4 py-3">
         
         {/* Discover route, navigates to the discover events page */}
@@ -74,8 +74,8 @@ export default function Footer() {
           <p className={footerTextClass}>Chat</p>
         </span>
         <span className={footerIContClass}>
-          <NavLink className={linkClass}>
-            <img src={user} alt="" />
+          <NavLink className={linkClass} to={`/profile`}>
+            <img src={userIcon} alt="" />
           </NavLink>
           <p className={footerTextClass}>Profile</p>
         </span>

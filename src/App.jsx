@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { getMe, syncUser, logoutRequest } from "./api/auth";
 import CreateEventPage from "./pages/CreateEventPage";
+import Profile from "./pages/Profile";
 
 // App does two things:
 //   1. maps every URL to a page
@@ -155,11 +156,23 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/events/create"element={
-          <ProtectedRoute user={user} isLoading={isLoading}>
-            <CreateEventPage user={user}></CreateEventPage>
-          </ProtectedRoute>
-        }></Route>
+        <Route
+          path="/events/create"
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <CreateEventPage user={user}></CreateEventPage>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+        <Route
+          path={`/profile`}
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <Profile user={user}></Profile>
+            </ProtectedRoute>
+          }
+        ></Route>
 
         {/* '*' matches anything no other route claimed. Keep it LAST. */}
         <Route path="*" element={<NotFoundPage />} />

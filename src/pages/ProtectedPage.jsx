@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-import { getProtected } from '../api/auth';
-import { getEvents } from '../api/events';
+import { useState, useEffect } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+import { getProtected } from "../api/auth";
+import { getEvents } from "../api/events";
+import { addUserToEvent } from "../api/eventParticipants";
 
 // A page to TEST the protected backend endpoint. ProtectedRoute makes sure you
 // can only get here when logged in; the button then calls /api/protected and
@@ -32,7 +33,7 @@ export default function ProtectedPage({ user }) {
       try {
         const allEvents = await getEvents();
         setAllEvents(allEvents);
-      } catch(err) {
+      } catch (err) {
         setEventsError(err.message);
       } finally {
         setLoadEvents(false);
@@ -62,43 +63,48 @@ export default function ProtectedPage({ user }) {
 
   return (
     <section>
-      <h1 className='mb-6 text-3xl font-semibold text-(--text-h)'>Protected</h1>
+      <h1 className="mb-6 text-3xl font-semibold text-(--text-h)">Protected</h1>
 
-      <p className='mb-2'>
+      <p className="mb-2">
         You can only see this page while logged in
-        {user?.username ? `, ${user.username}` : ''}.
+        {user?.username ? `, ${user.username}` : ""}.
       </p>
-      <p className='mb-4 text-sm'>
-        Signed in with{' '}
-        <code>{isAuth0User ? 'an Auth0 token' : 'our own JWT cookie'}</code>.
+      <p className="mb-4 text-sm">
+        Signed in with{" "}
+        <code>{isAuth0User ? "an Auth0 token" : "our own JWT cookie"}</code>.
       </p>
 
       <button
         onClick={handleTest}
         disabled={isLoading}
-        className='rounded-md bg-(--accent) px-4 py-2 font-medium text-white transition hover:opacity-90 disabled:opacity-60'
+        className="rounded-md bg-(--accent) px-4 py-2 font-medium text-white transition hover:opacity-90 disabled:opacity-60"
       >
-        {isLoading ? 'Calling…' : 'Call /api/protected'}
+        {isLoading ? "Calling…" : "Call /api/protected"}
       </button>
 
-      {error && <p className='mt-4 text-red-500'>{error}</p>}
+      {error && <p className="mt-4 text-red-500">{error}</p>}
 
       {result && (
-        <pre className='mt-4 overflow-x-auto rounded-md border border-(--border) p-4 text-left text-sm'>
+        <pre className="mt-4 overflow-x-auto rounded-md border border-(--border) p-4 text-left text-sm">
           {JSON.stringify(result, null, 2)}
         </pre>
       )}
-      
-      {loadEvents && <p>Loading Events...</p> } 
+
+      {loadEvents && <p>Loading Events...</p>}
 
       {eventsError && <p>{eventsError}</p>}
 
-      {!loadEvents && !eventsError && (
+      {!loadEvents &&
+        !eventsError &&
         events.map((event) => (
-          <p key={event.id}>{event.name} {event.description} {event.category} {event.time} {event.zipcode}</p> // note: backend event shape - name, description, category, time, address, zipcode, facilities_id
-        ))
-      )}
-
+          <section key={event.id}>
+            <p>
+              {event.name} {event.description} {event.category} {event.time}{" "}
+              {event.zipcode}
+            </p>
+            <button className="border-2 border-amber-50 rounded-xl p-2 cursor-pointer" onClick={()=>(addUserToEvent(user.id, event.id))}>join</button>
+          </section>
+        ))}
     </section>
   );
 }

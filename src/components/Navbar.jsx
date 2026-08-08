@@ -6,14 +6,14 @@ import { NavLink } from 'react-router';
 // Navbar takes `user` and `onLogout` as props from App. It doesn't fetch
 // anything or know how you logged in — it just renders what it's handed. A
 // component this simple is easy to reason about and easy to reuse.
-export default function Navbar({ user, onLogout }) {
+export default function Navbar({ user, onLogout, className=''}) {
   const linkClass = ({ isActive }) =>
     `px-3 py-2 rounded-md text-sm font-medium ${
       isActive ? 'text-(--accent)' : 'hover:text-(--text-h)'
     }`;
 
   return (
-    <header className='border-b border-(--border)'>
+    <header className={`border-b border-(--border) w-full h-[8vh] ${className}`} >
       <nav className='mx-auto flex max-w-3xl items-center gap-2 px-4 py-3'>
         <NavLink
           to='/' end
