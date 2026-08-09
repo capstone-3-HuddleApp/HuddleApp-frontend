@@ -6,8 +6,8 @@ import search from '../assets/interface_icons/search.svg'
 import userIcon from '../assets/interface_icons/user.svg'
 
 /**
- * $$$-Method Creation: 07/08/2026, [Md Shamin Ahsan Anaph]
- * $$$-Most Recent Change: 07/08/2026, [Md Shamin Ahsan Anaph]
+ * $$$-Method Creation: 08/07/2026, [Md Shamin Ahsan Anaph]
+ * $$$-Most Recent Change: 08/07/2026, [Md Shamin Ahsan Anaph]
  * $$$-Method Description:
  *    Renders the bottom navigation bar. Shows different links
  * $$$-Functions Using This Method:
@@ -26,19 +26,6 @@ export default function Footer({user, className=''}) {
   const footerCreatebtn = "flex items-center w-10 h-10 bg-white rounded-none rotate-45 p-2";
   const footerTextClass = "font-bold text-xs";
 
-
-  /**
- * $$$-Funtion Creation: 07/08/2026, [Md Shamin Ahsan Anaph]
- * $$$-Most Recent Change: 07/08/2026, [Md Shamin Ahsan Anaph]
- * $$$-Method Description:
- *    Gets IsActive from the NavLink component and renders different 
- * style based on the current active tab.
- * $$$-Component Using This Function:
- *    Footer-Navlink components
- * $$$-Description of Variables:
- *    Repeating class styles grouped into class variables
- *
- * */
   const linkClass = ({ isActive }) =>
     `${footerIconClass} ${isActive ? "bg-blue-300" : "bg-white"}`;
 
@@ -55,7 +42,7 @@ export default function Footer({user, className=''}) {
         </span>
 
         <span className={footerIContClass}>
-          <NavLink className={linkClass}>
+          <NavLink className={linkClass} to={`/map`}>
             <img src={mapIcon} alt="" />
           </NavLink>
           <p className={footerTextClass}>Map</p>
@@ -68,11 +55,13 @@ export default function Footer({user, className=''}) {
 
 
         <span className={footerIContClass}>
-          <NavLink className={linkClass}>
+          <NavLink className={linkClass} to={`/chat-rooms`}>
             <img src={messageIcon} alt="" />
           </NavLink>
           <p className={footerTextClass}>Chat</p>
         </span>
+
+
         <span className={footerIContClass}>
           <NavLink className={linkClass} to={`/profile`}>
             <img src={userIcon} alt="" />
