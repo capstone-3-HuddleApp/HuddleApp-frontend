@@ -55,7 +55,7 @@ export default function Footer({user, className=''}) {
         </span>
 
         <span className={footerIContClass}>
-          <NavLink className={linkClass}>
+          <NavLink className={linkClass} to={`/map`}>
             <img src={mapIcon} alt="" />
           </NavLink>
           <p className={footerTextClass}>Map</p>
@@ -68,11 +68,13 @@ export default function Footer({user, className=''}) {
 
 
         <span className={footerIContClass}>
-          <NavLink className={linkClass}>
+          <NavLink className={linkClass} to={`/chat-rooms`}>
             <img src={messageIcon} alt="" />
           </NavLink>
           <p className={footerTextClass}>Chat</p>
         </span>
+
+
         <span className={footerIContClass}>
           <NavLink className={linkClass} to={`/profile`}>
             <img src={userIcon} alt="" />

@@ -4,16 +4,17 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
-// import TasksPage from './pages/TasksPage';
-// import TaskDetailPage from './pages/TaskDetailPage';
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedPage from "./pages/ProtectedPage";
+import CreateEventPage from "./pages/CreateEventPage";
+import Profile from "./pages/Profile";
+import ChatRoom from "./pages/ChatRooms";
+import EventMap from "./pages/EventMap";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { getMe, syncUser, logoutRequest } from "./api/auth";
-import CreateEventPage from "./pages/CreateEventPage";
-import Profile from "./pages/Profile";
+
 
 // App does two things:
 //   1. maps every URL to a page
@@ -156,11 +157,30 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/map"
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <EventMap></EventMap>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/events/create"
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
               <CreateEventPage user={user}></CreateEventPage>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+        <Route
+          path={`/chat-rooms`}
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <ChatRoom></ChatRoom>
             </ProtectedRoute>
           }
         ></Route>
