@@ -37,7 +37,7 @@ const CATEGORY_TO_FACGROUP = {
   sports: ["PARKS AND PLAZAS"],
   arts: ["PARKS AND PLAZAS", "LIBRARIES"],
   education: ["LIBRARIES"],
-  entertainment: ["LIBRARIES"],
+  entertainment: ["LIBRARIES", "PARKS AND PLAZAS"],
 };
 
 const min_search_len = 4;
