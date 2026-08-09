@@ -1,6 +1,7 @@
 import FormField from "./FormField";
 import SelectField from "./SelectField";
 import { useState } from "react";
+import searchIcon from "../assets/interface_icons/search.svg";
 
 /**
  * $$$-Funtion Creation: 08/09/2026, [Md Shamin Ahsan Anaph]
@@ -40,10 +41,18 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
   }
 
   return (
-    <div className="mt-1.5 w-65 flex flex-row pr-1 pl-2 items-center-safe justify-center border-2 border-b-mauve-700 bg-mist-900 rounded-2xl">
+    <div className="flex min-h-11 w-full max-w-md items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 focus-within:border-(--accent) focus-within:ring-2 focus-within:ring-(--accent)/20 [&_label]:sr-only">
+    {/* Decorative search icon for the search input */}
+    <img
+      src={searchIcon}
+      alt=""
+      aria-hidden="true"
+      className="size-4 shrink-0 invert opacity-60"
+    />
     <FormField
-    className="pb-1 mr-1 h-10"
+      className="h-10 min-w-0 flex-1 [&_label]:sr-only [&_input]:border-0 [&_input]:bg-transparent [&_input]:px-0 [&_input:focus]:ring-0"
       label=""
+      aria-label={searchPlaceholder}
       name="search_events"
       value={value}
       onChange={handleChange}
@@ -51,8 +60,9 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
       placeholder={searchPlaceholder}
     />
     <SelectField
-    className="w-15 p-1 mb-1 h-8"
-        label=""
+      className="h-8 w-28 shrink-0 text-center appearance-none cursor-pointer rounded-full border border-white/15 bg-white/10 px-1 text-xs font-semibold text-white outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) [&_option]:bg-[#17141f] [&_option]:text-white"
+      label=""
+      aria-label={filterPlaceholder}
       name="search_events"
       value={value}
       onChange={handleChange}

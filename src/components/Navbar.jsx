@@ -46,17 +46,18 @@ export default function Navbar({ user, onLogout, className = "" }) {
 
   return (
     <header
-      className={`border-b border-(--border) w-full h-[8vh] ${className}`}
+      className={`min-h-[8vh] w-full border-b border-(--border) ${className}`}
     >
       {/* Auth pages: Display login/signup links or logout button*/}
       {(location.pathname === "/login" || location.pathname === "/signup") && (
-        <nav className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-3">
+        <nav className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:px-6">
           <NavLink
             to="/"
             end
-            className="mr-auto text-lg font-semibold text-(--text-h)"
+            aria-label="HUDL home"
+            className="mr-auto shrink-0 text-xl font-extrabold tracking-tight text-white"
           >
-            Huddle
+            HUDL
           </NavLink>
 
           {/* `end` makes "Home" active only on "/" exactly, not on every route. */}
@@ -100,13 +101,14 @@ export default function Navbar({ user, onLogout, className = "" }) {
 
       {/*// Protected route: Show logo and location search */}
       {location.pathname === "/protected" && (
-        <nav className="flex flex-row justify-between items-center p-1.5">
+        <nav className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:px-6">
           <NavLink
             to="/"
             end
-            className="mr-auto ml-4 text-lg font-semibold text-(--text-h)"
+            aria-label="HUDL home"
+            className="mr-auto shrink-0 text-xl font-extrabold tracking-tight text-white"
           >
-            Huddle
+            HUDL
           </NavLink>
 
           <SearchBar></SearchBar>
@@ -115,13 +117,14 @@ export default function Navbar({ user, onLogout, className = "" }) {
 
       {/**Chat Room page: shows the logo and room/search filter */}
       {location.pathname === "/chat-rooms" && (
-        <nav className="flex flex-row justify-between items-center p-1.5">
+        <nav className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:px-6">
           <NavLink
             to="/"
             end
-            className="mr-auto ml-4 text-lg font-semibold text-(--text-h)"
+            aria-label="HUDL home"
+            className="mr-auto shrink-0 text-xl font-extrabold tracking-tight text-white"
           >
-            Huddle
+            HUDL
           </NavLink>
 
           <SearchBar
@@ -133,11 +136,13 @@ export default function Navbar({ user, onLogout, className = "" }) {
 
       {/**user Profile: Display user name and logout button */}
       {location.pathname === "/profile" && (
-        <nav className="flex flex-row items-center">
-          <h1 className="text-2xl font-bold w-full ">{name}</h1>
+        <nav className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
+          <h1 className="min-w-0 flex-1 truncate text-xl font-extrabold tracking-tight text-white">
+            {name}
+          </h1>
           <button
             onClick={onLogout}
-            className="cursor-pointer flex items-center justify-center w-30 border-2 h-8 rounded-md mr-2 px-3 py-2 text-sm font-medium hover:text-(--text-h)"
+            className="shrink-0 cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-(--text) transition hover:text-(--text-h) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
           >
             Log out
           </button>
