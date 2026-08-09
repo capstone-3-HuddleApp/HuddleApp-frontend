@@ -19,7 +19,7 @@ export default function Layout({ user, onLogout, authError }) {
       />
 
       {/* Scrollable Main (with padding for fixed elements) */}
-      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 mt-20 mb-20 overflow-y-hidden">
+      <div className="mx-auto w-full max-w-3xl flex-1 px-4 pt-1 mt-20 mb-20 overflow-y-hidden">
         {authError && (
           <p
             role="alert"

@@ -146,7 +146,7 @@ function App() {
             They get setUser so they can report a successful login back up. */}
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/signup" element={<Signup setUser={setUser} />} />
-        <Route path="/events/:id" element={<EventDetailPage />} />
+        <Route path="/events/:id" element={<EventDetailPage user={user}/>} />
         {/* <Route path='/tasks' element={<TasksPage />} /> */}
         {/* <Route path='/tasks/:id' element={<TaskDetailPage />} /> */}
 
