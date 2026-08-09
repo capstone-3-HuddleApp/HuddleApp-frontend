@@ -11,6 +11,7 @@ import Footer from "./Footer";
 export default function Layout({ user, onLogout, authError }) {
   return (
     <div className="flex flex-col min-h-screen relative">
+      {/**Fixed top navbar */}
       <Navbar
         className="fixed top-0 left-0 right-0 z-50 bg-gray-950"
         user={user}

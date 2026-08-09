@@ -2,7 +2,28 @@ import FormField from "./FormField";
 import SelectField from "./SelectField";
 import { useState } from "react";
 
-
+/**
+ * $$$-Funtion Creation: 08/09/2026, [Md Shamin Ahsan Anaph]
+ * $$$-Most Recent Change: 08/09/2026, [Md Shamin Ahsan Anaph]
+ * 
+ * $$$-Method Description:
+ *    Renders a self-contained search and filter bar for events. Allows users to search
+ *    for events by name and filter by category (Sports, Arts, Education, Entertainment).
+ *    Manages its own state for search input and error handling. Accepts customizable
+ *    placeholders for both search and filter fields.
+ * 
+ * $$$-Component Using This Function:
+ *    Navbar (on /chat-rooms route)
+ * 
+ * $$$-Description of Variables:
+ *    - searchPlaceholder: Custom placeholder text for search input (default: "Search Events!")
+ *    - filterPlaceholder: Custom placeholder text for category filter (default: "Filter")
+ *    - value: Current search/filter input value
+ *    - error: Error state for form validation
+ *    - CATEGORY_OPTIONS: Array of category filter options (Sports, Arts, Education, Entertainment)
+ *    - handleChange: Updates value state when user types in search or selects category
+ *
+ * */
 export default function SearchBar({searchPlaceholder='Search Events!', filterPlaceholder='Filter'}) {
   const [error, setError] = useState(null);
   const [value, setValue] = useState("")
