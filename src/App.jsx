@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedPage from "./pages/ProtectedPage";
 import CreateEventPage from "./pages/CreateEventPage";
+import EventDetailPage from "./pages/EventDetailPage";
 import Profile from "./pages/Profile";
 import ChatRoom from "./pages/ChatRooms";
 import EventMap from "./pages/EventMap";
@@ -14,7 +15,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { getMe, syncUser, logoutRequest } from "./api/auth";
-
 
 // App does two things:
 //   1. maps every URL to a page
@@ -43,6 +43,7 @@ function App() {
     logout: auth0Logout,
   } = useAuth0();
 
+  const [geolocation, setGeolocation] = useState(null);
   // On a page refresh, THREE things can be in flight at once, and
   // ProtectedRoute must not redirect while any of them is still running —
   // otherwise a logged-in user gets bounced to /login every time they hit F5:
@@ -130,9 +131,22 @@ function App() {
     }
   }
 
+  const getLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setGeolocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => console.error(error),
+    );
+  };
+
   return (
     <Routes>
       {/* Every route below renders inside Layout (navbar + page slot). */}
+
       <Route
         element={
           <Layout user={user} onLogout={handleLogout} authError={authError} />
@@ -144,7 +158,6 @@ function App() {
             They get setUser so they can report a successful login back up. */}
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/signup" element={<Signup setUser={setUser} />} />
-
         {/* <Route path='/tasks' element={<TasksPage />} /> */}
         {/* <Route path='/tasks/:id' element={<TaskDetailPage />} /> */}
 
@@ -177,6 +190,15 @@ function App() {
         ></Route>
 
         <Route
+          path="/events/:id"
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <EventDetailPage user={user}></EventDetailPage>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+        <Route
           path={`/chat-rooms`}
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
@@ -189,7 +211,11 @@ function App() {
           path={`/profile`}
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <Profile user={user}></Profile>
+              <Profile
+                user={user}
+                getLocation={getLocation}
+                geolocation={geolocation}
+              ></Profile>
             </ProtectedRoute>
           }
         ></Route>
