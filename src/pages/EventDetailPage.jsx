@@ -97,7 +97,7 @@ export default function EventDetailPage({ user }) {
   }
 
   // Calculate the percentage of the attendee goal reached to fill the visual progress bar
-  const progressPercentage = Math.round((Event.participants.length / 10) * 100);
+  const progressPercentage = Math.round((Event.participants.length / Event.maxParticipants) * 100);
 
   // Get the first letter of the organizer's name to use as their profile avatar
   const organizerInitial = Event.organizer ? event.organizer.charAt(0) : "?";
