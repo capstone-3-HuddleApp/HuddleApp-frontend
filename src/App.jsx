@@ -202,7 +202,7 @@ function App() {
           path={`/chat-rooms`}
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <ChatRoom></ChatRoom>
+              <ChatRoom user={user}></ChatRoom>
             </ProtectedRoute>
           }
         ></Route>
