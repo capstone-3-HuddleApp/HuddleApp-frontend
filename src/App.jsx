@@ -160,7 +160,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        
         <Route
           path="/map"
           element={
