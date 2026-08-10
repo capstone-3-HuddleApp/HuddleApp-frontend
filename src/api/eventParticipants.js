@@ -32,7 +32,7 @@ export async function addUserToEvent(userId, eventId) {
     throw new Error(body.error || `Could not add user (${res.status})`);
   }
 
-  return res.json();
+  return res;
 
 }
 
