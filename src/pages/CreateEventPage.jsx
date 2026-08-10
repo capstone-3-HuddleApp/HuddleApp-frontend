@@ -18,6 +18,7 @@ const REQUIRED_FIELDS = [
   "category",
   "time",
   "address",
+  "location",
   "zipcode",
   "facilities_id",
 ];
@@ -60,6 +61,7 @@ export default function CreateEventPage() {
     location: "",
     address: "",
     zipcode: "",
+    maxParticipants: 99999,
     facilities_id: "",
   });
 
@@ -337,9 +339,17 @@ export default function CreateEventPage() {
           error={errors.description}
         />
 
-        {/* Plain text input for now since there's no facilities list wired
-            up yet. Once you have a way to fetch facilities, swap this for a
-            <select> of facility names mapped to their id. */}
+        <FormField
+            className="w-[60%]"
+            label="Max Participants (optional)"
+            name="maxParticipants"
+            value={formData.maxParticipants}
+            onChange={handleChange}
+            error={errors.maxParticipants}
+            required
+          />
+
+        {/* facilities hidden, auto filled up when user chooses a location*/}
         <FormField
           className="hidden"
           label="Facility ID"
