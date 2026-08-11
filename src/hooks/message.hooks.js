@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { getSocket, initSocket } from '../api/socket';
-import fetchMessages from '../api/messeges';
+import { useState, useEffect } from "react";
+import { getSocket, initSocket } from "../api/socket";
+import { postMessage, fetchMessages } from "../api/messeges";
 
 export const useEventChat = (eventId) => {
   const [messages, setMessages] = useState([]);
@@ -15,18 +15,25 @@ export const useEventChat = (eventId) => {
       try {
         initSocket();
 
-        socket.emit('join_event', eventId);
         console.log(`✅ Joined room: event_${eventId}`);
 
-        socket.on('receive_event_message', (data) => {
-          setMessages((prev) => [...prev, data]);
+        socket.on("receive_event_message", (data) => {
+
+          setMessages((prev) => {
+            const updated = [...prev, data];
+            return updated.sort(
+              (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+            );
+          });
         });
 
-        const initialMessages = await fetchMessages(eventId);  // ← Use it here
+        socket.emit("join_event", eventId);
+
+        const initialMessages = await fetchMessages(eventId); 
         setMessages(initialMessages);
         setIsLoading(false);
       } catch (err) {
-        console.error('Error in loadAndJoin:', err);
+        console.error("Error in loadAndJoin:", err);
         setError(err.message);
         setIsLoading(false);
       }
@@ -35,9 +42,9 @@ export const useEventChat = (eventId) => {
     loadAndJoin();
 
     return () => {
-      socket.off('receive_event_message');
+      socket.off("receive_event_message");
     };
-  }, [eventId, socket]);
+  }, [eventId]);
 
   return { messages, setMessages, isLoading, error };
 };
@@ -45,15 +52,14 @@ export const useEventChat = (eventId) => {
 export const useSendMessage = (eventId, userId) => {
   const socket = getSocket();
 
-  const sendMessage = (messageText) => {
-    if (!messageText.trim()) return;
-
-    socket.emit('send_event_message', {
-      eventId,
-      userId,
-      message: messageText,
-    });
+  const sendMsg = async (messageText) => {
+    try {
+      const savedMessage = await postMessage(eventId, userId, messageText); // ← Await it
+      socket.emit("send_event_message", savedMessage);
+    } catch (err) {
+      console.error("Error:", err);
+    }
   };
 
-  return { sendMessage };
+  return { sendMessage: sendMsg };
 };

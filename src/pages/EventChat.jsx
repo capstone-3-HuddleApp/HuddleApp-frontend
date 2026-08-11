@@ -57,6 +57,9 @@ export default function EventChat({ user }) {
     return <p className="text-red-500">Error: {error}</p>;
   }
 
+  console.log('user id:', user.id)
+
+
 
   return (
     <div className="flex flex-col p-4 ">
@@ -66,23 +69,25 @@ export default function EventChat({ user }) {
         </p>
       ) : (
         messages.map((msg) => (
-            
+          
           <div
-          {...console.log(msg)}
             key={msg.id}
-            className={`mb-4 flex ${msg.userId === user.id ? "justify-end" : "justify-start"}`}
-          >
+            className={`mb-4 flex ${msg.user_id === user.id ? "justify-end" : "justify-start"}`}
+          >{console.log(msg)}
             <div
             onClick={()=>{
                 if (ishidden === 'hidden') {
                     setHidden('')
                 }else{setHidden('hidden')}
             }}
-              className={`max-w-xs px-4 py-2 rounded-lg ${msg.userId === user.id ? "bg-blue-500 text-black" : "bg-gray-300 text-black"}`}
+              className={`max-w-xs px-4 py-2 rounded-lg ${msg.user_id === user.id ? "bg-blue-500 text-black" : "bg-gray-300 text-black"}`}
             >
+            <p className="text-[0.7rem]">{msg?.sender?.username}</p>
               <p className="text-sm font-semibold">{msg.message}</p>
+              {console.log('msg:', msg.user_id)}
+              {console.log('user:', user.id)}
               <p>{msg.content}</p>
-              <small className={`text-[0.7rem] ${ishidden}`}>{new Date(msg.timestamp).toLocaleTimeString()}</small>
+              <small>{new Date(msg.createdAt).toLocaleTimeString()}</small>
             </div>
           </div>
         ))
