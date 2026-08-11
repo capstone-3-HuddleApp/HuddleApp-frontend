@@ -59,7 +59,7 @@ export default function EventChat({ user }) {
 
 
   return (
-    <div className="flex flex-1 h-full flex-col-reverse overflow-y-auto p-4 ">
+    <div className="flex flex-col p-4 ">
       {messages.length === 0 ? (
         <p className="text-center text-gray-500">
           No messages yet. Start the conversation!
