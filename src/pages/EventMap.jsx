@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
-// Import your custom API function!
-// (Adjust the path if your api folder is located somewhere else)
-import { getEvents } from "../api/events";
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { getEvents } from '../api/events'; 
+import { searchFacilities } from '../api/facilities'
 
 // --- ESSENTIAL VITE FIX FOR LEAFLET ICONS ---
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -18,11 +16,28 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
   shadowUrl: markerShadow,
 });
+
+//Icon for the facilities
+const facilityIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 // ---------------------------------------------
 
 export default function MapPage() {
   const [userLocation, setUserLocation] = useState([40.7128, -74.006]); // Defaults to NYC
   const [eventsWithCoords, setEventsWithCoords] = useState([]);
+<<<<<<< HEAD
+=======
+  
+  // State for the custom radius input box
+  const [radiusInput, setRadiusInput] = useState(""); 
+  const [facilitiesWithCoords, setFacilitiesWithCoords] = useState([]);
+>>>>>>> 2b00ebd (Working on the facilities)
 
   useEffect(() => {
     // 1. Get User Location
@@ -32,8 +47,12 @@ export default function MapPage() {
       });
     }
 
+<<<<<<< HEAD
     // Fetching the Data & Geocoding from database
     const fetchEventsAndCoordinates = async () => {
+=======
+    const fetchAllDataAndCoordinates = async () => {
+>>>>>>> 2b00ebd (Working on the facilities)
       try {
         // Use your frontend API file to securely fetch the data
         const realEvents = await getEvents();
@@ -73,11 +92,31 @@ export default function MapPage() {
       } catch (error) {
         console.error("Error fetching events from API:", error);
       }
+
+    try {
+      const data = await searchFacilities({});
+
+      const realfacilities = data.records || [];
+      const updatedFacilities = realfacilities.map(facility => {
+        if (facility.latitude && facility.longitude) {
+            return { 
+              ...facility, 
+              coords: [parseFloat(facility.latitude), parseFloat(facility.longitude)] 
+            };
+          }
+          return null
+      }).filter(f=> f !== null)
+      setFacilitiesWithCoords(updatedFacilities);
+      } catch (error) {
+        console.error("Error fetching facilities from frontend API:", error);
+      }
     };
 
-    fetchEventsAndCoordinates();
+    fetchAllDataAndCoordinates();
+
   }, []);
 
+<<<<<<< HEAD
   // Rendering the Map Layout
   return (
     // 1. Removed max-w-md, pl-4, and pr-4 so it stretches completely side-to-side
@@ -99,6 +138,102 @@ export default function MapPage() {
           {/* User Marker */}
           <Marker position={userLocation}>
             <Popup>You are here!</Popup>
+=======
+  // If the input is empty, default to 5 miles. Otherwise, use what they typed.
+  const activeRadius = radiusInput === "" ? 2 : Number(radiusInput);
+  const isFiltering = radiusInput !== ""; 
+
+  // Filter events based on distance
+  const filteredEvents = isFiltering 
+    ? eventsWithCoords.filter(event => {
+        const distance = getDistanceInMiles(
+          userLocation[0], userLocation[1],
+          event.coords[0], event.coords[1]
+        );
+        return distance <= activeRadius;
+      })
+    : eventsWithCoords; // Show all if empty
+
+
+  const filteredFacilities = isFiltering 
+    ? facilitiesWithCoords.filter(facility => {
+        const distance = getDistanceInMiles(
+          userLocation[0], userLocation[1],
+          facility.coords[0], facility.coords[1]
+        );
+        return distance <= activeRadius;
+      })
+    : facilitiesWithCoords;
+
+
+  return (
+    <div className="fixed top-25 left-0 right-0 bottom-25 z-0 overflow-hidden bg-gray-900">
+      
+      {/* SEARCH RADIUS BOX */}
+      {/* Note: changed z-1000 to z-[1000] because standard Tailwind requires brackets for arbitrary values */}
+      <div className="absolute top-4 right-4 z-[1000] bg-white p-3 rounded-lg shadow-lg border border-gray-200 w-56">
+        <label className="block text-sm font-bold text-gray-700 mb-2">
+          Search Radius (Miles):
+        </label>
+        
+        <input 
+          type="number"
+          min="0"
+          step="0.1"
+          value={radiusInput}
+          onChange={(e) => setRadiusInput(e.target.value)}
+          className="w-full bg-white border border-gray-400 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2"
+          placeholder="e.g. 10 (blank for all)"
+        />
+      </div>
+
+      <MapContainer
+        style={{ height: '100%', width: '100%' }}
+        key={userLocation.toString()} 
+        center={userLocation} 
+        zoom={11} 
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        
+        {/* INVISIBLE AUTO-ZOOM MANAGER */}
+        <MapBounds 
+          center={userLocation} 
+          radiusInMeters={activeRadius * 1609.34} 
+        />
+
+        {/* USER LOCATION */}
+        <Marker position={userLocation}>
+          <Popup>You are here!</Popup>
+        </Marker>
+
+        {/* SHADED CIRCLE */}
+        <Circle 
+          center={userLocation} 
+          radius={activeRadius * 1609.34} 
+          pathOptions={{ color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.1 }}
+        />
+
+        {/* EVENT MARKERS (BLUE) */}
+        {filteredEvents.map((event) => (
+          <Marker key={`event-${event.id}`} position={event.coords}>
+            <Popup>
+              <strong>{event.name}</strong><br/>
+              <em>Event</em>
+            </Popup>
+          </Marker>
+        ))}
+
+        {/* FIX 3: Render the Green Facility Markers! */}
+        {filteredFacilities.map((facility) => (
+          <Marker key={`facility-${facility.uid || facility.id}`} position={facility.coords} icon={facilityIcon}>
+            <Popup>
+              <strong>{facility.facname || "Public Facility"}</strong><br/>
+              <em>{facility.factype || "Facility"}</em>
+            </Popup>
+>>>>>>> 2b00ebd (Working on the facilities)
           </Marker>
 
           {/* Event Markers */}
