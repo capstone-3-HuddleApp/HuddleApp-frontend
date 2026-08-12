@@ -1,17 +1,23 @@
-import { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router";
+import { useAuth0 } from "@auth0/auth0-react";
+import "leaflet/dist/leaflet.css";
+import MapPage from './pages/EventMap';
 
-import Layout from './components/Layout';
-import HomePage from './pages/HomePage';
-// import TasksPage from './pages/TasksPage';
-// import TaskDetailPage from './pages/TaskDetailPage';
-import NotFoundPage from './pages/NotFoundPage';
-import ProtectedPage from './pages/ProtectedPage';
-import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import { getMe, syncUser, logoutRequest, signup } from './api/auth';
+import Layout from "./components/Layout";
+import HomePage from "./pages/HomePage";
+import NotFoundPage from "./pages/NotFoundPage";
+import ProtectedPage from "./pages/ProtectedPage";
+import CreateEventPage from "./pages/CreateEventPage";
+import EventDetailPage from "./pages/EventDetailPage";
+import Profile from "./pages/Profile";
+import ChatRoom from "./pages/ChatRooms";
+import EventMap from "./pages/EventMap";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import { getMe, syncUser, logoutRequest } from "./api/auth";
+import EventChat from "./pages/EventChat";
 
 // App does two things:
 //   1. maps every URL to a page
@@ -40,6 +46,7 @@ function App() {
     logout: auth0Logout,
   } = useAuth0();
 
+  const [geolocation, setGeolocation] = useState(null);
   // On a page refresh, THREE things can be in flight at once, and
   // ProtectedRoute must not redirect while any of them is still running —
   // otherwise a logged-in user gets bounced to /login every time they hit F5:
@@ -53,9 +60,7 @@ function App() {
   // below, there'd be a window where nothing is "loading" but nobody is logged
   // in either — and that window is exactly when the redirect fires.
   const isLoading =
-    isCheckingSession ||
-    isAuth0Loading ||
-    (isAuth0User && !user && !authError);
+    isCheckingSession || isAuth0Loading || (isAuth0User && !user && !authError);
 
   // ---------- 1. on page load: are we already logged in? ----------
   // Our JWT lives in an httpOnly cookie. That cookie survives a refresh, but
@@ -91,7 +96,7 @@ function App() {
           // Auth0 gives us a nickname; fall back to the email's local part.
           // It's only a SUGGESTION — the backend adjusts it if that username
           // is taken or too short, and tells us what it actually used.
-          username: auth0User.nickname || auth0User.email?.split('@')[0],
+          username: auth0User.nickname || auth0User.email?.split("@")[0],
         });
         setUser(dbUser);
         setAuthError(null);
@@ -118,7 +123,7 @@ function App() {
     } catch (error) {
       // Even if the request fails, still drop the user locally — staying
       // "logged in" on screen after clicking Log out is the worse outcome.
-      console.error('Logout failed:', error.message);
+      console.error("Logout failed:", error.message);
     }
 
     setUser(null);
@@ -129,36 +134,107 @@ function App() {
     }
   }
 
+  const getLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setGeolocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => console.error(error),
+    );
+  };
+
   return (
     <Routes>
       {/* Every route below renders inside Layout (navbar + page slot). */}
+      
       <Route
         element={
           <Layout user={user} onLogout={handleLogout} authError={authError} />
         }
       >
-        <Route path='/' element={<HomePage onSignup={Signup} onLogin={Login}/>} />
+        <Route path="/" element={<HomePage />} />
 
         {/* Public on purpose: you can reach these while logged OUT.
             They get setUser so they can report a successful login back up. */}
-        <Route path='/login' element={<Login setUser={setUser} />} />
-        <Route path='/signup' element={<Signup setUser={setUser} />} />
-
+        <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/signup" element={<Signup setUser={setUser} />} />
         {/* <Route path='/tasks' element={<TasksPage />} /> */}
         {/* <Route path='/tasks/:id' element={<TaskDetailPage />} /> */}
 
         {/* Only reachable when logged in — ProtectedRoute redirects otherwise. */}
         <Route
-          path='/protected'
+          path="/protected"
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
               <ProtectedPage user={user} />
             </ProtectedRoute>
           }
         />
+        
+        <Route
+          path="/map"
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <EventMap/>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/events/create"
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <CreateEventPage user={user}></CreateEventPage>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+        <Route
+          path="/events/:id"
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <EventDetailPage user={user}></EventDetailPage>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+        <Route
+          path={`/chat-rooms`}
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <ChatRoom user={user}></ChatRoom>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+
+        <Route
+          path={`/room/:eventId`}
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <EventChat user={user}></EventChat>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+        <Route
+          path={`/profile`}
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <Profile
+                user={user}
+                getLocation={getLocation}
+                geolocation={geolocation}
+              ></Profile>
+            </ProtectedRoute>
+          }
+        ></Route>
 
         {/* '*' matches anything no other route claimed. Keep it LAST. */}
-        <Route path='*' element={<NotFoundPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );
