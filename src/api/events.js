@@ -40,6 +40,21 @@ export async function getMyEvents() {
   return res.json();
 }
 
+//READ EVENTS PARTICIPATING- Get /api/events/participating. only evets a user is pariticipating in
+export async function getEventsParticipating() {
+  const res = await fetch(`${BASE_URL}/api/events/participating`,{
+    credentials: 'include',
+    headers: {'Content-Type': 'application/json'},
+  })
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not load your events (${res.status})`);
+  }
+
+  return res.json();
+}
+
 // READ ONE — GET /api/events/:id. Returns a single event, or throws on 404.
 export async function getEvent(id) {
   const res = await fetch(`${BASE_URL}/api/events/${id}`, {

@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
@@ -9,6 +9,8 @@ import Footer from "./Footer";
 // owns that state; Layout just happens to sit in between. authError is shown
 // here rather than on one page, because a broken login affects all of them.
 export default function Layout({ user, onLogout, authError }) {
+let location = useLocation()
+
   return (
     <div className="flex flex-col min-h-screen relative">
       {/**Fixed top navbar */}
@@ -19,7 +21,7 @@ export default function Layout({ user, onLogout, authError }) {
       />
 
       {/* Scrollable Main (with padding for fixed elements) */}
-      <div className="mx-auto w-full max-w-3xl flex-1 px-4 pt-1 mt-20 mb-20 overflow-y-hidden">
+      <div className={`mx-auto w-full max-w-3xl flex-1 px-4 pt-1 mt-20 mb-20 overflow-y-hidden ${location.pathname.startsWith("/room/")? 'flex flex-col-reverse' : ''}`}>
         {authError && (
           <p
             role="alert"

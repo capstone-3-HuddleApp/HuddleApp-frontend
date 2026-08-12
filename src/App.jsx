@@ -17,6 +17,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { getMe, syncUser, logoutRequest } from "./api/auth";
+import EventChat from "./pages/EventChat";
 
 // App does two things:
 //   1. maps every URL to a page
@@ -204,7 +205,17 @@ function App() {
           path={`/chat-rooms`}
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <ChatRoom></ChatRoom>
+              <ChatRoom user={user}></ChatRoom>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+
+        <Route
+          path={`/room/:eventId`}
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <EventChat user={user}></EventChat>
             </ProtectedRoute>
           }
         ></Route>
