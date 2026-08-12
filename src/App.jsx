@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router";
 import { useAuth0 } from "@auth0/auth0-react";
+import "leaflet/dist/leaflet.css";
+import MapPage from './pages/EventMap';
 
 import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
@@ -146,7 +148,7 @@ function App() {
   return (
     <Routes>
       {/* Every route below renders inside Layout (navbar + page slot). */}
-
+      
       <Route
         element={
           <Layout user={user} onLogout={handleLogout} authError={authError} />
@@ -170,12 +172,12 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        
         <Route
           path="/map"
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <EventMap></EventMap>
+              <EventMap/>
             </ProtectedRoute>
           }
         />
