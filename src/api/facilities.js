@@ -10,7 +10,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // SEARCH — POST /api/facilities. Every field is optional; send only the ones
 // relevant to the current query
-// params = { optype?, facgroup?, facsubgrp?, search? }
+// params = { optype={Public}, facgroup={parks and plazas, libraries }, facsubgrp?, search? }
 export async function searchFacilities(params = {}) {
   const res = await fetch(`${BASE_URL}/api/facilities`, {
     method: 'POST',
