@@ -65,19 +65,29 @@ function MapBounds({ center, radiusInMeters }) {
   return null;
 }
 
-// =========================================================================
-// FIXED: Moved ZoomTracker OUTSIDE of MapPage so React doesn't recreate it
-// =========================================================================
-function ZoomTracker({ onZoomChange }) {
+// Tracks both Zoom AND the physical corners of the screen
+
+function MapStateTracker({ onMapChange }) {
   const map = useMapEvents({
+    moveend: () => {
+      // Fires when the user finishes dragging/panning
+      onMapChange(map.getZoom(), map.getBounds());
+    },
     zoomend: () => {
-      // Whenever the user stops pinching/scrolling, update our state
-      onZoomChange(map.getZoom());
+      // Fires when the user finishes pinching
+      onMapChange(map.getZoom(), map.getBounds());
     },
   });
+
+  // Set the initial bounds as soon as the map loads
+  useEffect(() => {
+    onMapChange(map.getZoom(), map.getBounds());
+  }, [map, onMapChange]);
+
   return null;
 }
-// =========================================================================
+
+
 
 export default function MapPage() {
   const [userLocation, setUserLocation] = useState([40.7128, -74.006]);
@@ -89,6 +99,7 @@ export default function MapPage() {
   // FIXED: Added the missing state to remember the zoom level!
   // =========================================================================
   const [currentZoom, setCurrentZoom] = useState(11);
+  const [currentBounds, setCurrentBounds] = useState(null); // Remembers the screen corners
   // =========================================================================
 
   useEffect(() => {
@@ -189,6 +200,12 @@ export default function MapPage() {
       })
     : facilitiesWithCoords;
 
+    const visibleFacilities = filteredFacilities.filter(facility => {
+    if (!currentBounds) return false;
+    // Check if the facility's exact coordinates fall inside the map's current screen box
+    return currentBounds.contains(L.latLng(facility.coords[0], facility.coords[1]));
+  });
+
   return (
     <div className="fixed top-25 left-0 right-0 bottom-25 z-0 overflow-hidden bg-gray-900">
       {/* SEARCH RADIUS BOX */}
@@ -210,7 +227,7 @@ export default function MapPage() {
 
       <MapContainer
         style={{ height: "100%", width: "100%" }}
-        key={userLocation.toString()}
+        // key={userLocation.toString()}
         center={userLocation}
         zoom={11}
       >
@@ -226,8 +243,10 @@ export default function MapPage() {
         />
 
         {/* LISTENS FOR YOU PINCHING THE MAP */}
-        <ZoomTracker onZoomChange={setCurrentZoom} />
-
+        <MapStateTracker onMapChange={(zoom, bounds) => {
+          setCurrentZoom(zoom);
+          setCurrentBounds(bounds);
+        }} />
         {/* USER LOCATION */}
         <Marker position={userLocation}>
           <Popup>You are here!</Popup>
@@ -255,8 +274,8 @@ export default function MapPage() {
           </Marker>
         ))}
 
-        {/* FACILITY MARKERS (GREEN) - Only visible when zoomed in to level 14 or closer */}
-        {currentZoom >= 15 && filteredFacilities.map((facility) => (
+        {/* FACILITY MARKERS (GREEN) - Only visible when zoomed in to level 15 or closer */}
+        {currentZoom >= 14 && visibleFacilities.map((facility) => (
           <Marker key={`facility-${facility.uid || facility.id}`} position={facility.coords} icon={facilityIcon}>
             <Popup>
               <strong>{facility.facname || "Public Facility"}</strong><br/>
