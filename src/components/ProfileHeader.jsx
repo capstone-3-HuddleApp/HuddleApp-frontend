@@ -8,7 +8,7 @@ export default function ProfileHeader ({profile, action}) {
     const profileInitial = fullName.charAt(0).toUpperCase();
 // Uses a responsive card that stacks on phones and becomes a row on larger screens.
     return(
-        <section className="flex flex-col items-center gap-4 rounded-3xl border border-white/10 bg-[#211b31] p-5 text-center shadow-xl sm:flex-row sm:p-6 sm:text-left">
+        <section className="flex flex-col items-center gap-4 rounded-3xl border border-[#d8cdb6] bg-[#f8d8aa] p-5 text-center shadow-xl sm:flex-row sm:p-6 sm:text-left">
             {/* Uses the profile initial as an avatar until picture uploads are implemented. */}
             <div className="flex size-24 shrink-0 items-center justify-center rounded-full border-2 border-(--accent) bg-(--accent-bg) text-3xl font-extrabold text-(--text-h) sm:size-28">
                 {profileInitial}

@@ -190,10 +190,10 @@ export default function MapPage() {
     : facilitiesWithCoords;
 
   return (
-    <div className="fixed top-25 left-0 right-0 bottom-25 z-0 overflow-hidden bg-gray-900">
+    <div className="fixed top-25 left-0 right-0 bottom-25 z-0 overflow-hidden bg-[#fff9df]">
       {/* SEARCH RADIUS BOX */}
-      <div className="absolute top-4 right-4 z-[1000] bg-white p-3 rounded-lg shadow-lg border border-gray-200 w-56">
-        <label className="block text-sm font-bold text-gray-700 mb-2">
+      <div className="absolute top-4 right-4 z-[1000] bg-[#f8d8aa] p-3 rounded-lg shadow-lg border border-[#d8cdb6] w-56">
+        <label className="block text-sm font-bold text-[#29272b] mb-2">
           Search Radius (Miles):
         </label>
 
@@ -203,7 +203,7 @@ export default function MapPage() {
           step="0.1"
           value={radiusInput}
           onChange={(e) => setRadiusInput(e.target.value)}
-          className="w-full bg-white border border-gray-400 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2"
+          className="w-full bg-[#fff9df] border border-[#d8cdb6] text-[#29272b] text-sm rounded-md focus:ring-[#f2a451] focus:border-[#f2a451] block p-2"
           placeholder="e.g. 10 (blank for all)"
         />
       </div>
@@ -238,8 +238,8 @@ export default function MapPage() {
           center={userLocation}
           radius={activeRadius * 1609.34}
           pathOptions={{
-            color: "#3b82f6",
-            fillColor: "#3b82f6",
+            color: "#43906f",
+            fillColor: "#43906f",
             fillOpacity: 0.1,
           }}
         />

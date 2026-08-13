@@ -5,7 +5,7 @@ export default function ProfileStats({
 }) {
     // Displays reusable profile totals without assuming whether the viewer owns the profile.
     return (
-        <section className="mt-5 grid grid-cols-3 overflow-hidden rounded-2xl border border-white/10 bg-[#211b31]">
+        <section className="mt-5 grid grid-cols-3 overflow-hidden rounded-2xl border border-[#d8cdb6] bg-[#f8d8aa]">
             {/* Keeps the three profile totals evenly divided across the available width. */}
             <div className="flex min-w-0 flex-col items-center gap-1 px-2 py-4 text-center">
                 <strong className="text-xl font-extrabold text-(--text-h)">
@@ -16,7 +16,7 @@ export default function ProfileStats({
                 </span>
             </div>
             
-            <div className="flex min-w-0 flex-col items-center gap-1 border-l border-white/10 px-2 py-4 text-center">
+            <div className="flex min-w-0 flex-col items-center gap-1 border-l border-[#d8cdb6] px-2 py-4 text-center">
                 <strong className="text-xl font-extrabold text-(--text-h)">
                     {followingCount ?? "--"}
                 </strong>
@@ -25,7 +25,7 @@ export default function ProfileStats({
                 </span>
             </div>
             
-            <div className="flex min-w-0 flex-col items-center gap-1 border-l border-white/10 px-2 py-4 text-center">
+            <div className="flex min-w-0 flex-col items-center gap-1 border-l border-[#d8cdb6] px-2 py-4 text-center">
                 <strong className="text-xl font-extrabold text-(--text-h)">
                     {eventsCount ?? "--"}
                 </strong>

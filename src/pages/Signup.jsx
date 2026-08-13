@@ -106,13 +106,13 @@ function Signup({ setUser }) {
   return (
     <section className='mx-auto w-full max-w-md py-4 sm:py-8'>   {/* 8/6/26 ET - added py-4 for smaller vertical padding on phones and sm:py-8 for larger padding on wider screens */}
 
-      <div className='rounded-3xl border border-white/20 bg-[#211d30] p-6 shadow-2xl shadow-black/20 sm:p-8'> {/* 8/6/26 ET - added a dark-purple background, rounded corners, a subtle border, and a soft shadow around the signup form */}
+      <div className='rounded-3xl border border-[#f4c96b] bg-[#f8d8aa] p-6 shadow-2xl shadow-[#b39588]/20 sm:p-8'> {/* 8/6/26 ET - added a dark-purple background, rounded corners, a subtle border, and a soft shadow around the signup form */}
          {/*8/6/26 Removes the default margin and kept the default white color  */}
-        <h1 className='m-0 text-3xl font-bold tracking-tight text-white'>
+        <h1 className='m-0 text-3xl font-bold tracking-tight text-[#29272b]'>
           Sign Up
         </h1>
 
-        <p className='mt-2 mb-7 text-sm leading-6 text-[#aaa3bd]'> {/* 8/6/26 ET - added space around the description and uses softer text for contrast with the heading */}
+        <p className='mt-2 mb-7 text-sm leading-6 text-[#7d8794]'> {/* 8/6/26 ET - added space around the description and uses softer text for contrast with the heading */}
           Create an account to find and join local events.</p> {/* 8/6/26 ET - changed the text to better fit project */}
 
         {/*make signup errors more readable*/}
@@ -169,7 +169,7 @@ function Signup({ setUser }) {
           <button
             type='submit'
             disabled={isLoading}
-            className='mt-2 min-h-12 rounded-xl bg-linear-to-r from-violet-600 to-purple-700 px-4 py-3 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
+            className='mt-2 min-h-12 rounded-xl border border-[#d18a32] bg-linear-to-r from-[#ffe991] to-[#f4c96b] px-4 py-3 font-semibold text-[#29272b] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
             >
             {isLoading ? 'Creating account…' : 'Create account'}
           </button>
@@ -178,25 +178,25 @@ function Signup({ setUser }) {
         {/* The OAuth alternative. Same destination, completely different route:
             Auth0 collects the credential and we never handle a password. */}
         <div className='my-6 flex items-center gap-3'>
-          <span className='h-px flex-1 bg-white/10' />
-          <span className='text-xs tracking-widest text-[#777087] uppercase'>or</span>
-          <span className='h-px flex-1 bg-white/10' />
+          <span className='h-px flex-1 bg-[#b39588]/30' />
+          <span className='text-xs tracking-widest text-[#7d8794] uppercase'>or</span>
+          <span className='h-px flex-1 bg-[#b39588]/30' />
         </div>
 
         {/* Styles the Auth0 option as a secondary button so the main signup action stays most prominent */}
         <button
           type='button'
           onClick={() => loginWithRedirect()}
-          className='min-h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-semibold text-[#d8d3e6] transition hover:border-violet-400/40 hover:bg-white/10 hover:text-white'        >
+          className='min-h-12 w-full rounded-xl border border-[#b39588] bg-[#fff9df] px-4 py-3 font-semibold text-[#29272b] transition hover:border-[#d18a32] hover:bg-[#fff3c7] hover:text-[#29272b]'        >
           Continue with Auth0
         </button>
 
         {/* changed classname so that Log In text is purple and when hovering a link shows and turns violet to emphasize you are hovering it */}
-        <p className='mt-6 text-center text-sm text-[#aaa3bd]'>
+        <p className='mt-6 text-center text-sm text-[#7d8794]'>
           Already have an account?{' '}
           <Link
             to='/login'
-            className='font-semibold text-violet-400 transition hover:text-violet-300 hover:underline'          >
+            className='font-semibold text-[#f2a451] transition hover:text-[#e8943e] hover:underline'          >
             Log in
           </Link>
         </p>

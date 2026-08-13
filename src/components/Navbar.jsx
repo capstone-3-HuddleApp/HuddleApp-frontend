@@ -55,7 +55,7 @@ export default function Navbar({ user, onLogout, className = "" }) {
             to="/"
             end
             aria-label="HUDL home"
-            className="mr-auto shrink-0 text-xl font-extrabold tracking-tight text-white"
+            className="mr-auto shrink-0 text-xl font-extrabold tracking-tight text-[#f2a451]"
           >
             HUDL
           </NavLink>
@@ -90,7 +90,7 @@ export default function Navbar({ user, onLogout, className = "" }) {
               </NavLink>
               <NavLink
                 to="/signup"
-                className="rounded-md bg-(--accent) px-3 py-2 text-sm font-medium text-white"
+                className="rounded-md bg-(--accent) px-3 py-2 text-sm font-medium text-[#29272b]"
               >
                 Sign up
               </NavLink>
@@ -106,7 +106,7 @@ export default function Navbar({ user, onLogout, className = "" }) {
             to="/"
             end
             aria-label="HUDL home"
-            className="mr-auto shrink-0 text-xl font-extrabold tracking-tight text-white"
+            className="mr-auto shrink-0 text-xl font-extrabold tracking-tight text-[#f2a451]"
           >
             HUDL
           </NavLink>
@@ -122,7 +122,7 @@ export default function Navbar({ user, onLogout, className = "" }) {
             to="/"
             end
             aria-label="HUDL home"
-            className="mr-auto shrink-0 text-xl font-extrabold tracking-tight text-white"
+            className="mr-auto shrink-0 text-xl font-extrabold tracking-tight text-[#f2a451]"
           >
             HUDL
           </NavLink>
@@ -137,7 +137,7 @@ export default function Navbar({ user, onLogout, className = "" }) {
       {/**user Profile: Display user name and logout button */}
       {location.pathname === "/profile" && (
         <nav className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
-          <h1 className="min-w-0 flex-1 truncate text-xl font-extrabold tracking-tight text-white">
+          <h1 className="min-w-0 flex-1 truncate text-xl font-extrabold tracking-tight text-[#29272b]">
             {name}
           </h1>
           <button

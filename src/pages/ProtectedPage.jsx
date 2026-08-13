@@ -77,7 +77,7 @@ export default function ProtectedPage({ user }) {
       <button
         onClick={handleTest}
         disabled={isLoading}
-        className="rounded-md bg-(--accent) px-4 py-2 font-medium text-white transition hover:opacity-90 disabled:opacity-60"
+        className="rounded-md bg-(--accent) px-4 py-2 font-medium text-[#29272b] transition hover:opacity-90 disabled:opacity-60"
       >
         {isLoading ? "Calling…" : "Call /api/protected"}
       </button>
@@ -102,7 +102,7 @@ export default function ProtectedPage({ user }) {
               {event.name} {event.description} {event.category} {event.time}{" "}
               {event.zipcode}
             </p>
-            <button className="border-2 border-amber-50 rounded-xl p-2 cursor-pointer" onClick={()=>(addUserToEvent(user.id, event.id))}>join</button>
+            <button className="border-2 border-[#f4c96b] rounded-xl p-2 cursor-pointer" onClick={()=>(addUserToEvent(user.id, event.id))}>join</button>
           </section>
         ))}
     </section>
