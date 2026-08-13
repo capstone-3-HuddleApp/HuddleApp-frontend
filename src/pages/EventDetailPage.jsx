@@ -3,13 +3,17 @@ import { useParams, Link } from "react-router";
 import { useEffect, useState } from "react";
 import { getEvent } from "../api/events";
 import { addUserToEvent } from "../api/eventParticipants";
+import { followUser, getMyFollows, unfollowUser } from "../api/auth";
 
 // Main component for displaying the details of a single event
-export default function EventDetailPage({ user }) {
+export default function EventDetailPage({ user, getAccessToken }) {
   const [Event, setEvent] = useState(null);
   const [isloading, setLoading] = useState(true);
   const [isParticipating, setParticipating] = useState(false);
   const [error, setError] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(true);
+  const [followError, setFollowError] = useState("");
 
   // Grab the event ID directly from the webpage URL
   const { id } = useParams();
@@ -28,6 +32,47 @@ export default function EventDetailPage({ user }) {
         setLoading(false);
       });
   }, [id, user]);
+
+  // Checks whether the logged-in user already follows this events organizer
+  useEffect(() => {
+    if (!Event || user.id === Event.creator_id) {
+      return;
+    }
+
+    let ignoreResult = false;
+
+    async function loadFollowStatus() {
+      try {
+        setFollowLoading(true);
+        setFollowError("");
+
+        const token = getAccessToken ? await getAccessToken() : undefined;
+        const data = await getMyFollows(token);
+
+        const alreadyFollowing = data.following.some(
+          (followedUser) => followedUser.id === Event.creator_id,
+        );
+
+        if (!ignoreResult) {
+          setIsFollowing(alreadyFollowing);
+        }
+      } catch (error) {
+        if (!ignoreResult) {
+          setFollowError(error.message);
+        }
+      } finally {
+        if (!ignoreResult) {
+          setFollowLoading(false);
+        }
+      }
+    }
+
+    loadFollowStatus();
+
+    return () => {
+      ignoreResult = true;
+    };
+  }, [Event, user.id, getAccessToken]);
 
   //Converts the IsoDateTime of our database into a date object and formats it accordingly
   //Returns an object with date and time keys
@@ -69,6 +114,28 @@ export default function EventDetailPage({ user }) {
     console.error("Failed to join:", error);
   }
 };
+
+// Toggles following the event organizer when the button is pressed
+async function handleFollowToggle() {
+  try {
+    setFollowLoading(true);
+    setFollowError("");
+
+    const token = getAccessToken ? await getAccessToken() : undefined;
+    
+    if (isFollowing) {
+      await unfollowUser(Event.creator_id, token);
+      setIsFollowing(false);
+    } else {
+      await followUser(Event.creator_id, token);
+      setIsFollowing(true);
+    }
+  } catch (error) {
+    setFollowError(error.message);
+  } finally {
+    setFollowLoading(false);
+  }
+}
 
 
   function capitalizeFirst(str) {
@@ -193,9 +260,22 @@ export default function EventDetailPage({ user }) {
             </div>
           </div>
           {user.id !== Event.creator_id && (
-            <button className="text-purple-600 font-semibold bg-purple-50 px-4 py-1.5 rounded-full text-sm hover:bg-purple-100 transition">
-              Follow
-            </button>
+           <div className="flex flex-col items-center gap-1">
+              <button
+                type="button"
+                onClick={handleFollowToggle}
+                disabled={followLoading}
+                className="rounded-full bg-purple-50 px-4 py-1.5 text-sm font-semibold text-purple-600 transition hover:bg-purple-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {followLoading ? "Loading..." : isFollowing ? "Unfollow" : "Follow"}
+              </button>
+
+              {followError && (
+                <p role="alert" className="max-w-40 text-center text-xs text-red-700">
+                  {followError}
+                </p>
+              )}
+           </div>
           )}
         </div>
 

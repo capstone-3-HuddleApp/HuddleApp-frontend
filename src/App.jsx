@@ -196,7 +196,10 @@ function App() {
           path="/events/:id"
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <EventDetailPage user={user}></EventDetailPage>
+              <EventDetailPage
+                user={user}
+                getAccessToken={isAuth0User ? getAccessTokenSilently : null}
+              />
             </ProtectedRoute>
           }
         ></Route>
@@ -226,6 +229,8 @@ function App() {
             <ProtectedRoute user={user} isLoading={isLoading}>
               <Profile
                 user={user}
+                setUser={setUser}
+                getAccessToken={isAuth0User ? getAccessTokenSilently : null}
                 getLocation={getLocation}
                 geolocation={geolocation}
               ></Profile>
