@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, useMapEvents } from 'react-leaflet';
+// 1. IMPORT CHANGED HERE
+import { useNavigate } from 'react-router';
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { getEvents } from "../api/events";
@@ -19,10 +21,8 @@ L.Icon.Default.mergeOptions({
 
 //Icon for the facilities
 const facilityIcon = new L.Icon({
-  iconUrl:
-    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -66,17 +66,18 @@ function MapBounds({ center, radiusInMeters }) {
 }
 
 // Tracks both Zoom AND the physical corners of the screen
-
 function MapStateTracker({ onMapChange }) {
   const map = useMapEvents({
     moveend: () => {
-      // Fires when the user finishes dragging/panning
       onMapChange(map.getZoom(), map.getBounds());
     },
     zoomend: () => {
-      // Fires when the user finishes pinching
       onMapChange(map.getZoom(), map.getBounds());
     },
+    click: () => {
+      // Closes the popup if the user clicks anywhere empty on the map
+      onMapChange("click"); 
+    }
   });
 
   // Set the initial bounds as soon as the map loads
@@ -87,20 +88,20 @@ function MapStateTracker({ onMapChange }) {
   return null;
 }
 
-
-
 export default function MapPage() {
+  // 2. HOOK ADDED HERE
+  const navigate = useNavigate();
+
   const [userLocation, setUserLocation] = useState([40.7128, -74.006]);
   const [eventsWithCoords, setEventsWithCoords] = useState([]);
   const [facilitiesWithCoords, setFacilitiesWithCoords] = useState([]);
   const [radiusInput, setRadiusInput] = useState("");
 
-  // =========================================================================
-  // FIXED: Added the missing state to remember the zoom level!
-  // =========================================================================
   const [currentZoom, setCurrentZoom] = useState(11);
-  const [currentBounds, setCurrentBounds] = useState(null); // Remembers the screen corners
-  // =========================================================================
+  const [currentBounds, setCurrentBounds] = useState(null); 
+  
+  // State to remember which event pin was clicked
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     if ("geolocation" in navigator) {
@@ -200,9 +201,8 @@ export default function MapPage() {
       })
     : facilitiesWithCoords;
 
-    const visibleFacilities = filteredFacilities.filter(facility => {
+  const visibleFacilities = filteredFacilities.filter(facility => {
     if (!currentBounds) return false;
-    // Check if the facility's exact coordinates fall inside the map's current screen box
     return currentBounds.contains(L.latLng(facility.coords[0], facility.coords[1]));
   });
 
@@ -227,7 +227,6 @@ export default function MapPage() {
 
       <MapContainer
         style={{ height: "100%", width: "100%" }}
-        // key={userLocation.toString()}
         center={userLocation}
         zoom={11}
       >
@@ -244,9 +243,14 @@ export default function MapPage() {
 
         {/* LISTENS FOR YOU PINCHING THE MAP */}
         <MapStateTracker onMapChange={(zoom, bounds) => {
-          setCurrentZoom(zoom);
-          setCurrentBounds(bounds);
+          if (zoom === "click") {
+            setSelectedEvent(null);
+          } else {
+            setCurrentZoom(zoom);
+            setCurrentBounds(bounds);
+          }
         }} />
+
         {/* USER LOCATION */}
         <Marker position={userLocation}>
           <Popup>You are here!</Popup>
@@ -265,17 +269,19 @@ export default function MapPage() {
 
         {/* EVENT MARKERS (BLUE) */}
         {filteredEvents.map((event) => (
-          <Marker key={`event-${event.id}`} position={event.coords}>
-            <Popup>
-              <strong>{event.name}</strong>
-              <br />
-              <em>Event</em>
-            </Popup>
-          </Marker>
+          <Marker 
+            key={`event-${event.id}`} 
+            position={event.coords}
+            eventHandlers={{
+              click: () => {
+                setSelectedEvent(event);
+              },
+            }}
+          />
         ))}
 
         {/* FACILITY MARKERS (GREEN) - Only visible when zoomed in to level 15 or closer */}
-        {currentZoom >= 14 && visibleFacilities.map((facility) => (
+        {currentZoom >= 15 && visibleFacilities.map((facility) => (
           <Marker key={`facility-${facility.uid || facility.id}`} position={facility.coords} icon={facilityIcon}>
             <Popup>
               <strong>{facility.facname || "Public Facility"}</strong><br/>
@@ -283,8 +289,63 @@ export default function MapPage() {
             </Popup>
           </Marker>
         ))}
-
       </MapContainer>
+
+      {/* BOTTOM SHEET OVERLAY */}
+      <div 
+        className={`absolute bottom-0 left-0 right-0 z-[2000] bg-white rounded-t-3xl p-5 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-in-out ${
+          selectedEvent ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        {selectedEvent && (
+          <div className="relative flex gap-4">
+            
+            {/* Close 'X' Button */}
+            <button 
+              onClick={() => setSelectedEvent(null)} 
+              className="absolute -top-2 -right-2 text-gray-400 hover:text-gray-700 w-8 h-8 flex items-center justify-center font-bold text-xl cursor-pointer"
+            >
+              &times;
+            </button>
+
+            {/* Event Picture (Left Side) */}
+            <img 
+              src={selectedEvent.image || "https://placehold.co/150x150/png"} 
+              alt={selectedEvent.name} 
+              className="w-28 h-28 object-cover rounded-xl shadow-sm bg-gray-100"
+            />
+
+            {/* Event Details & Button (Right Side) */}
+            <div className="flex flex-col justify-between flex-1 pr-6">
+              <div>
+                <h3 className="font-bold text-lg text-gray-900 leading-tight line-clamp-2">
+                  {selectedEvent.name}
+                </h3>
+                
+                {/* Date - Using selectedEvent.time based on your Backend Model! */}
+                <p className="text-sm font-medium text-gray-500 mt-1">
+                  {selectedEvent.time ? new Date(selectedEvent.time).toLocaleDateString() : 'Date TBD'}
+                </p>
+                
+                {/* Calculated Distance */}
+                <p className="text-sm font-bold text-blue-600 mt-1">
+                  {getDistanceInMiles(userLocation[0], userLocation[1], selectedEvent.coords[0], selectedEvent.coords[1]).toFixed(1)} miles away
+                </p>
+              </div>
+
+              {/* More Details Button (Navigates instantly to the event page!) */}
+              <button 
+                onClick={() => window.location.href = `/events/${selectedEvent.id}`} 
+                className="mt-2 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg text-sm font-semibold transition shadow-md w-full block"
+              >
+                More details
+              </button>
+            </div>
+
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
