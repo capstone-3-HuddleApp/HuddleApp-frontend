@@ -51,7 +51,7 @@ export default function Footer({ user, className = "" }) {
   return (
     <>
       <footer
-        className={`border-b border-(--border) bg-black border-2 border-b-blue-50 h-[10vh] ${className}`}
+        className={`border-b border-(--border) bg-black border-2 border-b-blue-50 h-[10vh] relative z-3000 ${className}`}
       >
         {!location.pathname.startsWith("/room/") && (
           <nav className="mx-auto flex flex-row max-w-3xl items-center justify-center-safe gap-2 px-4 py-3">
