@@ -101,7 +101,7 @@ function Login({ setUser }) {
         {errors.general && (
           <p
             role='alert'
-            className='mb-4 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300'
+            className='mb-4 rounded-xl border border-[#d97b8e] bg-[#f3b3bf] px-4 py-3 text-sm font-medium text-[#702b3a]'
           >
             {errors.general}
           </p>
