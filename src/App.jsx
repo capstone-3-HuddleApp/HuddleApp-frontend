@@ -7,7 +7,7 @@ import MapPage from './pages/EventMap';
 import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
-import ProtectedPage from "./pages/ProtectedPage";
+import DiscoverPage from "./pages/DiscoverPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import Profile from "./pages/Profile";
@@ -166,10 +166,10 @@ function App() {
 
         {/* Only reachable when logged in — ProtectedRoute redirects otherwise. */}
         <Route
-          path="/protected"
+          path="/discover"
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <ProtectedPage user={user} />
+              <DiscoverPage user={user} />
             </ProtectedRoute>
           }
         />

@@ -58,7 +58,7 @@ export default function Footer({ user, className = "" }) {
                 className={({ isActive }) =>
                   `${footerIconClass} border-[#4e9bb3] ${isActive ? "bg-[#89d6e8]" : "bg-[#89d6e8]/35"}`
                 }
-                to="/protected"
+                to="/discover"
               >
                 <img src={search} alt="" />
               </NavLink>
