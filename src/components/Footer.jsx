@@ -30,9 +30,9 @@ export default function Footer({ user, className = "" }) {
 
   //Repeating styles grouped together
   const footerIContClass = "flex flex-col items-center mr-3 ml-3";
-  const footerIconClass = "w-10 bg-white rounded-full p-2";
+  const footerIconClass = "w-10 rounded-full border-2 p-2 transition";
   const footerCreatebtn =
-    "flex items-center w-10 h-10 bg-white rounded-none rotate-45 p-2";
+    "flex items-center w-10 h-10 border-2 border-[#d18a32] bg-[#f8d8aa] rounded-none rotate-45 p-2";
   const footerTextClass = "font-bold text-xs";
 
   const handleSendMessage = (e) => {
@@ -43,28 +43,35 @@ export default function Footer({ user, className = "" }) {
     setInput(""); // Clear input
   };
 
-  const linkClass = ({ isActive }) =>
-    `${footerIconClass} ${isActive ? "bg-blue-300" : "bg-white"}`;
-
   console.log(location.pathname);
 
   return (
     <>
       <footer
-        className={`border-b border-(--border) bg-black border-2 border-b-blue-50 h-[10vh] ${className}`}
+        className={`border-b border-(--border) bg-[#ffe991] border-2 border-b-[#d8cdb6] h-[10vh] ${className}`}
       >
         {!location.pathname.startsWith("/room/") && (
           <nav className="mx-auto flex flex-row max-w-3xl items-center justify-center-safe gap-2 px-4 py-3">
             {/* Discover route, navigates to the discover events page */}
             <span className={footerIContClass}>
-              <NavLink className={linkClass} to="/protected">
+              <NavLink
+                className={({ isActive }) =>
+                  `${footerIconClass} border-[#4e9bb3] ${isActive ? "bg-[#89d6e8]" : "bg-[#89d6e8]/35"}`
+                }
+                to="/protected"
+              >
                 <img src={search} alt="" />
               </NavLink>
               <p className="font-bold text-xs">Discover</p>
             </span>
 
             <span className={footerIContClass}>
-              <NavLink className={linkClass} to={`/map`}>
+              <NavLink
+                className={({ isActive }) =>
+                  `${footerIconClass} border-[#2f7659] ${isActive ? "bg-[#75b99a]" : "bg-[#75b99a]/35"}`
+                }
+                to={`/map`}
+              >
                 <img src={mapIcon} alt="" />
               </NavLink>
               <p className={footerTextClass}>Map</p>
@@ -79,14 +86,24 @@ export default function Footer({ user, className = "" }) {
             </NavLink>
 
             <span className={footerIContClass}>
-              <NavLink className={linkClass} to={`/chat-rooms`}>
+              <NavLink
+                className={({ isActive }) =>
+                  `${footerIconClass} border-[#7d8794] ${isActive ? "bg-[#dce7ed]" : "bg-[#dce7ed]/45"}`
+                }
+                to={`/chat-rooms`}
+              >
                 <img src={messageIcon} alt="" />
               </NavLink>
               <p className={footerTextClass}>Chat</p>
             </span>
 
             <span className={footerIContClass}>
-              <NavLink className={linkClass} to={`/profile`}>
+              <NavLink
+                className={({ isActive }) =>
+                  `${footerIconClass} border-[#c97f88] ${isActive ? "bg-[#f2b6bd]" : "bg-[#f2b6bd]/40"}`
+                }
+                to={`/profile`}
+              >
                 <img src={userIcon} alt="" />
               </NavLink>
               <p className={footerTextClass}>Profile</p>
@@ -95,7 +112,7 @@ export default function Footer({ user, className = "" }) {
         )}
 
         {location.pathname.startsWith("/room/") && (
-          <section className="mt-4 flex min-h-11 w-full max-w-md items-center gap-2 rounded-full border border-white/50 bg-white/5 px-4 focus-within:border-(--accent) focus-within:ring-2 focus-within:ring-(--accent)/20 [&_label]:sr-only">
+          <section className="mt-4 flex min-h-11 w-full max-w-md items-center gap-2 rounded-full border border-[#d8cdb6] bg-[#fff9df]/70 px-4 focus-within:border-(--accent) focus-within:ring-2 focus-within:ring-(--accent)/20 [&_label]:sr-only">
             <FormField
               id="message"
               name="message"
@@ -104,7 +121,7 @@ export default function Footer({ user, className = "" }) {
               onChange={(e) => setInput(e.target.value)}
               className="h-10 min-w-0 flex-1 [&_label]:sr-only [&_input]:border-0 [&_input]:bg-transparent [&_input]:px-0 [&_input:focus]:ring-0"
             />
-            <button className="size-fit bg-amber-50 rounded-full cursor-pointer" onClick={handleSendMessage}><img className="size-8 invert shrink-0 opacity-60" src={sendIcon} alt="" /></button>
+            <button className="size-fit bg-[#fff9df] rounded-full cursor-pointer" onClick={handleSendMessage}><img className="size-8 shrink-0 opacity-60" src={sendIcon} alt="" /></button>
           </section>
         )}
       </footer>

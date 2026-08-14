@@ -41,7 +41,7 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
   }
 
   return (
-    <div className="flex min-h-11 w-full max-w-md items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 focus-within:border-(--accent) focus-within:ring-2 focus-within:ring-(--accent)/20 [&_label]:sr-only">
+    <div className="flex min-h-11 w-full max-w-md items-center gap-2 rounded-full border border-[#d8cdb6] bg-[#fff9df]/70 px-4 focus-within:border-(--accent) focus-within:ring-2 focus-within:ring-(--accent)/20 [&_label]:sr-only">
     {/* Decorative search icon for the search input */}
     <img
       src={searchIcon}
@@ -60,7 +60,7 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
       placeholder={searchPlaceholder}
     />
     <SelectField
-      className="h-8 w-28 shrink-0 text-center appearance-none cursor-pointer rounded-full border border-white/15 bg-white/10 px-1 text-xs font-semibold text-white outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) [&_option]:bg-[#17141f] [&_option]:text-white"
+      className="h-8 w-28 shrink-0 text-center appearance-none cursor-pointer rounded-full border border-[#d8cdb6] bg-[#ffe991] px-1 text-xs font-semibold text-[#29272b] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) [&_option]:bg-[#fff9df] [&_option]:text-[#29272b]"
       label=""
       aria-label={filterPlaceholder}
       name="search_events"

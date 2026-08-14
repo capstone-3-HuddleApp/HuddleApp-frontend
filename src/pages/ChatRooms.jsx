@@ -45,7 +45,7 @@ export default function ChatRoom({ user }) {
           className="flex flex-row text-start p-1 border-0 text-[0.9rem] font-extrabold h-15 w-full"
           key={event.id}
         >
-          <section className="w-10 h-9 m-2 bg-white rounded-full p-2">
+          <section className="w-10 h-9 m-2 bg-[#fff9df] rounded-full p-2">
             <img src={userIcon} alt="" />
           </section>
           

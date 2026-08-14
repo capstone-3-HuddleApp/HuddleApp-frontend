@@ -214,7 +214,7 @@ export default function CreateEventPage() {
 
   return (
     <div className="mx-auto max-w-md">
-      <h1 className="mb-6 text-2xl font-bold text-white">Create an event</h1>
+      <h1 className="mb-6 text-2xl font-bold text-[#29272b]">Create an event</h1>
 
       {submitError && (
         <p
@@ -276,7 +276,7 @@ export default function CreateEventPage() {
             required
           />
           {isSearching && (
-            <p className="mt-1 text-xs text-[#777087]">Searching…</p>
+            <p className="mt-1 text-xs text-[#7d8794]">Searching…</p>
           )}
 
           {searchError && (
@@ -286,18 +286,18 @@ export default function CreateEventPage() {
           )}
 
           {suggestions.length > 0 && (
-            <ul className="absolute z-10 mt-1 w-full h-60 overflow-y-scroll rounded-xl border border-white/10 bg-[#17141f] shadow-lg">
+            <ul className="absolute z-10 mt-1 w-full h-60 overflow-y-scroll rounded-xl border border-[#d8cdb6] bg-[#fff9df] shadow-lg">
               {suggestions.map((facility) => (
                 <li key={facility.uid}>
                   <button
                     type="button"
                     onClick={() => handleSelectFacility(facility)}
-                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-violet-500/20"
+                    className="w-full px-4 py-2 text-left text-sm text-[#29272b] hover:bg-[#f2a451]/20"
                   >
                     <span className="block font-semibold">
                       {facility.facname}
                     </span>
-                    <span className="block text-xs text-[#777087]">
+                    <span className="block text-xs text-[#7d8794]">
                       {facility.address}, {facility.city}
                     </span>
                   </button>
@@ -363,7 +363,7 @@ export default function CreateEventPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-2 rounded-xl bg-violet-500 py-3 text-sm font-semibold text-white transition hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-2 rounded-xl bg-[#f2a451] py-3 text-sm font-semibold text-[#29272b] transition hover:bg-[#e8943e] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? "Creating…" : "Create event"}
         </button>
