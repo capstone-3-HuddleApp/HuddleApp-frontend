@@ -35,3 +35,17 @@ export async function GetEventImg(eventId) {
         throw error;
     }
 }
+
+export async function GetProfileImg(userId) {
+    try {
+        const response = await fetch(`${BASE_URL}/api/image/profile/${userId}`);
+        
+        if (!response.ok) throw new Error("Failed to fetch images");
+        
+        const { data } = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Get images error:", error);
+        throw error;
+    }
+}
