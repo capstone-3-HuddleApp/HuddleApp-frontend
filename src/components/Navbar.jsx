@@ -115,6 +115,12 @@ export default function Navbar({ user, onLogout, className = "" }) {
         </nav>
       )}
 
+      {location.pathname === '/events/create' && (
+        <h1 className="text-3xl font-bold text-[#29272b]">
+        Create an event
+        </h1>
+      )}
+
       {/**Chat Room page: shows the logo and room/search filter */}
       {location.pathname === "/chat-rooms" && (
         <nav className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:px-6">
