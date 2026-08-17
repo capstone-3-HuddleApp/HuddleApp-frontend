@@ -21,7 +21,7 @@ let location = useLocation()
       />
 
       {/* Scrollable Main (with padding for fixed elements) */}
-      <div className={`mx-auto w-full max-w-3xl flex-1 px-4 pt-1 mt-20 mb-20 overflow-y-hidden ${location.pathname.startsWith("/room/")? 'flex flex-col-reverse' : ''}`}>
+      <div className={`w-full flex-1 px-4 pt-1 mt-20 mb-20 overflow-y-hidden ${location.pathname.startsWith("/room/")? 'flex flex-col-reverse' : ''}`}>
         {authError && (
           <p
             role="alert"

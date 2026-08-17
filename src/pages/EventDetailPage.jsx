@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getEvent } from "../api/events";
 import { addUserToEvent } from "../api/eventParticipants";
 import { followUser, getMyFollows, unfollowUser } from "../api/auth";
+import { GetEventImg } from "../api/images";
 
 // Main component for displaying the details of a single event
 export default function EventDetailPage({ user, getAccessToken }) {
@@ -14,6 +15,8 @@ export default function EventDetailPage({ user, getAccessToken }) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(true);
   const [followError, setFollowError] = useState("");
+  const [images, setImages] = useState([]);
+
 
   // Grab the event ID directly from the webpage URL
   const { id } = useParams();
@@ -93,50 +96,62 @@ export default function EventDetailPage({ user, getAccessToken }) {
   };
 
   const handleJoinEvent = async () => {
-  try {
-    const res = await addUserToEvent(user.id, Event.id);
-    
-    if (res.ok) {
-      console.log("Successfully joined!");
-      
-      // Add user to participants locally instead of refetching
-      setEvent((prevEvent) => ({
-        ...prevEvent,
-        participants: [
-          ...prevEvent.participants,
-          { id: user.id, username: user.username, email: user.email }
-        ]
-      }));
-      
-      setParticipating(true);
+    try {
+      const res = await addUserToEvent(user.id, Event.id);
+
+      if (res.ok) {
+        console.log("Successfully joined!");
+
+        // Add user to participants locally instead of refetching
+        setEvent((prevEvent) => ({
+          ...prevEvent,
+          participants: [
+            ...prevEvent.participants,
+            { id: user.id, username: user.username, email: user.email },
+          ],
+        }));
+
+        setParticipating(true);
+      }
+    } catch (error) {
+      console.error("Failed to join:", error);
     }
-  } catch (error) {
-    console.error("Failed to join:", error);
-  }
-};
+  };
 
-// Toggles following the event organizer when the button is pressed
-async function handleFollowToggle() {
-  try {
-    setFollowLoading(true);
-    setFollowError("");
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const fetchedImages = await GetEventImg(parseInt(id));
+        setImages(fetchedImages);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-    const token = getAccessToken ? await getAccessToken() : undefined;
-    
-    if (isFollowing) {
-      await unfollowUser(Event.creator_id, token);
-      setIsFollowing(false);
-    } else {
-      await followUser(Event.creator_id, token);
-      setIsFollowing(true);
+    fetchImages();
+  }, [id]);
+
+  // Toggles following the event organizer when the button is pressed
+  async function handleFollowToggle() {
+    try {
+      setFollowLoading(true);
+      setFollowError("");
+
+      const token = getAccessToken ? await getAccessToken() : undefined;
+
+      if (isFollowing) {
+        await unfollowUser(Event.creator_id, token);
+        setIsFollowing(false);
+      } else {
+        await followUser(Event.creator_id, token);
+        setIsFollowing(true);
+      }
+    } catch (error) {
+      setFollowError(error.message);
+    } finally {
+      setFollowLoading(false);
     }
-  } catch (error) {
-    setFollowError(error.message);
-  } finally {
-    setFollowLoading(false);
   }
-}
-
 
   function capitalizeFirst(str) {
     if (!str || typeof str !== "string") return "";
@@ -164,7 +179,9 @@ async function handleFollowToggle() {
   }
 
   // Calculate the percentage of the attendee goal reached to fill the visual progress bar
-  const progressPercentage = Math.round((Event.participants.length / Event.maxParticipants) * 100);
+  const progressPercentage = Math.round(
+    (Event.participants.length / Event.maxParticipants) * 100,
+  );
 
   // Get the first letter of the organizer's name to use as their profile avatar
   const organizerInitial = Event.organizer ? event.organizer.charAt(0) : "?";
@@ -178,15 +195,19 @@ async function handleFollowToggle() {
 
   return (
     <>
-      <h1 className="mt-0 text-3xl font-bold text-[#29272b] leading-tight">
-        {Event.name}
-      </h1>
-      <span className="border-2 border-[#d18a32] bg-[#ffe991] rounded-2xl p-1 pl-2 pr-2 text-[#29272b]">
-        {capitalizeFirst(Event.category)}
-      </span>
+    {/* {console.log(images[0].url)} */}
+      <section className={`h-60 flex flex-col items-center justify-end`}>
+        <img className="h-full w-full object-center object-cover rounded-2xl" src={images[0]?.url}></img>
+        <h1 className="mt-0 text-3xl font-bold text-[#29272b] leading-tight">
+          {Event.name}
+        </h1>
+        <span className="border-2 border-[#d18a32] bg-[#ffe991] rounded-2xl p-1 pl-2 pr-2 text-[#29272b]">
+          {capitalizeFirst(Event.category)}
+        </span>
+      </section>
 
       {/*Grid displaying date, time, address and category */}
-      <div className="grid grid-cols-2 gap-4 mt-10 mb-10">
+      <div className="grid grid-cols-2 gap-4 mt-5 mb-8">
         <div className={`${grid_div}`}>
           <p className={`${grid_text}`}>Date</p>
           <p className="font-semibold text-[#29272b]">{date}</p>
@@ -260,22 +281,29 @@ async function handleFollowToggle() {
             </div>
           </div>
           {user.id !== Event.creator_id && (
-           <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1">
               <button
                 type="button"
                 onClick={handleFollowToggle}
                 disabled={followLoading}
                 className="rounded-full border border-[#c97f88] bg-[#f2b6bd] px-4 py-1.5 text-sm font-semibold text-[#62383d] transition hover:bg-[#ed9fa9] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {followLoading ? "Loading..." : isFollowing ? "Unfollow" : "Follow"}
+                {followLoading
+                  ? "Loading..."
+                  : isFollowing
+                    ? "Unfollow"
+                    : "Follow"}
               </button>
 
               {followError && (
-                <p role="alert" className="max-w-40 text-center text-xs text-red-700">
+                <p
+                  role="alert"
+                  className="max-w-40 text-center text-xs text-red-700"
+                >
                   {followError}
                 </p>
               )}
-           </div>
+            </div>
           )}
         </div>
 
