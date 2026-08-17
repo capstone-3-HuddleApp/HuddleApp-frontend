@@ -1,8 +1,10 @@
 import ProfileHeader from "../components/ProfileHeader";
 import ProfileStats from "../components/ProfileStats";
 import { useEffect, useState } from "react";
-import { getEventsParticipating } from "../api/events"
+import { getEventsParticipating } from "../api/events";
 import { getMyFollows, updateMyProfile } from "../api/auth";
+import ImageUpload from "../components/ImageUpload";
+import { uploadImage } from "../api/images";
 
 // ET - Created CSS for the profile page
 
@@ -18,11 +20,11 @@ export default function Profile({
   // Stores temporary display name edits until backend saving is implemented
   const [draftDisplayName, setDraftDisplayName] = useState(
     user.name ||
-    [user.f_name, user.l_name].filter(Boolean).join(" ") ||
-    user.username
+      [user.f_name, user.l_name].filter(Boolean).join(" ") ||
+      user.username,
   );
   // Stores temporary username edits without changing the logged-in account.
-  const [draftUsername, setDraftUsername  ] = useState(user.username);
+  const [draftUsername, setDraftUsername] = useState(user.username);
   // Remembers whether the public profile should show the display name or username.
   const [publicNameChoice, setPublicNameChoice] = useState("displayName");
   // Tracks the logged-in user's joined events and their request status
@@ -46,27 +48,56 @@ export default function Profile({
   //Controls the in-app warning shown before saving a changed username
   const [showUsernameWarning, setShowUsernameWarning] = useState(false);
 
+  // File states
+  const [file, setFile] = useState(null);
+  const [fileError, setFileError] = useState("");
+
+  // file constraints
+  const MAX_FILE_SIZE = 2 * 1024 * 1024;
+  const ALLOWED_TYPES = ["image/jpeg", "image/webp"];
+
+  // handleFileChange function
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) {
+      setFileError("No file selected");
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+      setFileError("Please select a jpeg or webp file");
+      return;
+    }
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      setFileError("File must be under 2MB");
+      return;
+    }
+    setFile(selectedFile);
+    setFileError("");
+  };
+
   //Loads the events that the logged-in user has joined when the profile opens
-  useEffect(()=>{
+  useEffect(() => {
     let ignoreResult = false;
 
     async function loadJoinedEvents() {
-      try{
+      try {
         setEventsLoading(true);
         setEventsError("");
 
         const response = await getEventsParticipating();
-        const events = Array.isArray(response) ? response : response.data ?? [];
+        const events = Array.isArray(response)
+          ? response
+          : (response.data ?? []);
 
-        if(!ignoreResult) {
+        if (!ignoreResult) {
           setJoinedEvents(events);
         }
-      } catch(error) {
-        if(!ignoreResult) {
+      } catch (error) {
+        if (!ignoreResult) {
           setEventsError(error.message);
         }
       } finally {
-        if(!ignoreResult) {
+        if (!ignoreResult) {
           setEventsLoading(false);
         }
       }
@@ -75,7 +106,7 @@ export default function Profile({
     loadJoinedEvents();
 
     return () => {
-      ignoreResult=true;
+      ignoreResult = true;
     };
   }, []);
 
@@ -113,9 +144,8 @@ export default function Profile({
 
   //Seperates completed events from the user's complete joined-event list
   const pastEvents = joinedEvents.filter(
-    (event) => new Date(event.time) < new Date()
+    (event) => new Date(event.time) < new Date(),
   );
-
 
   // Discards unsaved edits and closes the owner-only editor.
   function handleCancelEdit() {
@@ -124,11 +154,11 @@ export default function Profile({
       [user.f_name, user.l_name].filter(Boolean).join(" ") ||
       user.username;
 
-      setDraftDisplayName(originalDisplayName);
-      setDraftUsername(user.username);
-      setPublicNameChoice("displayName")
-      setIsEditing(false);
-      setShowUsernameWarning(false);
+    setDraftDisplayName(originalDisplayName);
+    setDraftUsername(user.username);
+    setPublicNameChoice("displayName");
+    setIsEditing(false);
+    setShowUsernameWarning(false);
   }
 
   // Validates draft fields and saves them through the authenticated profile API
@@ -150,7 +180,7 @@ export default function Profile({
     }
 
     // Pauses saving until the user confirms the username change in the app
-    if (username!== user.username && !showUsernameWarning) {
+    if (username !== user.username && !showUsernameWarning) {
       setShowUsernameWarning(true);
       return;
     }
@@ -167,6 +197,12 @@ export default function Profile({
       setUser(updatedUser);
       setDraftDisplayName(updatedUser.name);
       setDraftUsername(updatedUser.username);
+      //upload the image after creating the event
+      if (file) {
+        const publicId = `user/${user.id}/profile/${Date.now()}`;
+        await uploadImage(file, publicId, user.id);
+      }
+
       setSaveMessage("Profile updated successfully");
       setShowUsernameWarning(false);
     } catch (error) {
@@ -179,13 +215,16 @@ export default function Profile({
   // Centers the profile content and leaves room above the fixed bottom navigation.
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6 pb-28 sm:px-6 sm:pt-8">
-    {/* Shows the logged-in user's identity and supplies the owner-only edit action. */}
+      {/* Shows the logged-in user's identity and supplies the owner-only edit action. */}
       <ProfileHeader
         profile={user}
         action={
-          <button type="button"
-          className="rounded-full border border-[#c97f88] bg-[#f2b6bd] px-5 py-2.5 text-sm font-bold text-[#62383d] transition hover:bg-[#ed9fa9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c97f88]"
-          onClick={() => setIsEditing((currentlyEditing) => !currentlyEditing)}
+          <button
+            type="button"
+            className="cursor-pointer rounded-full border border-[#c97f88] bg-[#f2b6bd] px-5 py-2.5 text-sm font-bold text-[#62383d] transition hover:bg-[#ed9fa9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c97f88]"
+            onClick={() =>
+              setIsEditing((currentlyEditing) => !currentlyEditing)
+            }
           >
             {isEditing ? "Close editor" : "Edit Profile"}
           </button>
@@ -247,7 +286,7 @@ export default function Profile({
               </label>
 
               <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#d8cdb6] bg-[#fff9df]/80 px-4 py-3 text-sm font-semibold text-(--text-h) transition hover:border-(--accent-border)">
-              <input
+                <input
                   type="radio"
                   name="publicNameChoice"
                   value="username"
@@ -259,20 +298,15 @@ export default function Profile({
               </label>
             </div>
           </fieldset>
-          {/* Reserves a profile-picture action until image uploads are implemented. */}
-          <div className="mt-5">
-            <p className="text-sm font-semibold text-(--text-h)">
-              Profile picture
-            </p>
-
-            <button
-              type="button"
-              disabled
-              className="mt-2 w-full cursor-not-allowed rounded-xl border border-dashed border-[#b39588]/40 bg-[#fff9df]/50 px-4 py-3 text-sm font-semibold text-(--text) opacity-70"
-            >
-              Change photo -- coming soon
-            </button>
-          </div>
+          {/*Add image to the profile */}
+          <ImageUpload
+            className="pt-2"
+            label="Upload Profile Picture"
+            name="eventPhoto"
+            onChange={handleFileChange}
+            error={fileError}
+            accept=".jpg,.jpeg,.webp,image/jpeg,image/webp"
+          />
           {/* Provides local editor controls without claiming that backend saving works. */}
           <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button
@@ -311,7 +345,6 @@ export default function Profile({
               {saveMessage}
             </p>
           )}
-
         </section>
       )}
 
@@ -323,7 +356,9 @@ export default function Profile({
         followingCount={
           followsLoading || followsError ? undefined : followData.followingCount
         }
-        eventsCount={eventsLoading || eventsError ? undefined : joinedEvents.length}
+        eventsCount={
+          eventsLoading || eventsError ? undefined : joinedEvents.length
+        }
       />
       {/* while loading will show --, if loading fails will also show -- instead of the events joined number */}
 
@@ -341,9 +376,9 @@ export default function Profile({
         {/* Displays the request state before showing real completed events. */}
         {eventsLoading ? (
           <p className="mt-5 rounded-xl border border-dashed border-[#b39588]/40 bg-[#fff9df]/50 px-4 py-8 text-center text-sm text-(--text)">
-          Loading event history...
-        </p>
-        ) : eventsError? (
+            Loading event history...
+          </p>
+        ) : eventsError ? (
           <p
             role="alert"
             className="mt-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-center text-sm text-red-300"
@@ -356,14 +391,12 @@ export default function Profile({
           </p>
         ) : (
           <ul className="mt-5 space-y-3">
-            {pastEvents.map((event)=>(
+            {pastEvents.map((event) => (
               <li
                 key={event.id}
                 className="rounded-xl border border-[#d8cdb6] bg-[#fff9df]/50 px-4 py-3"
               >
-                <h3 className="font-bold text-(--text-h)">
-                  {event.name}
-                </h3>
+                <h3 className="font-bold text-(--text-h)">{event.name}</h3>
                 <p className="mt-1 text-sm text-(--text)">
                   {new Date(event.time).toLocaleDateString()}
                 </p>
@@ -399,7 +432,6 @@ export default function Profile({
             Location saved for this session
           </p>
         )}
-
       </section>
 
       {/* Confirms a username change using an app-styled modal instead of a browser popup. */}
@@ -419,8 +451,8 @@ export default function Profile({
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-[#566474]">
-              Changing your username also changes the username you use to log in.
-              Your email login and password will remain the same.
+              Changing your username also changes the username you use to log
+              in. Your email login and password will remain the same.
             </p>
             <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button

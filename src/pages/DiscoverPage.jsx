@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { getEvents } from "../api/events";
 import { addUserToEvent } from "../api/eventParticipants";
 import EventCard from "../components/EventCard";
+import RecEvents from "../components/RecEvents";
 
 // A page to TEST the protected backend endpoint. ProtectedRoute makes sure you
 // can only get here when logged in; the button then calls /api/protected and
@@ -74,7 +75,6 @@ export default function DiscoverPage({ user }) {
   //     }
   //   }
 
- 
   function handleZipConfirm() {
     setConfirmedZip(zipInput.trim());
   }
@@ -84,7 +84,7 @@ export default function DiscoverPage({ user }) {
     ? events.filter((e) => e.category === selectedCategory)
     : events;
 
-  // popular events + fitltered events by zip code 
+  // popular events + fitltered events by zip code
   const popularEvents = confirmedZip
     ? categoryFiltered.filter((e) => e.zipcode === confirmedZip)
     : categoryFiltered;
@@ -97,7 +97,7 @@ export default function DiscoverPage({ user }) {
   );
 
   return (
-    <section className="max-w-md mx-auto p-4">
+    <>
       {loadEvents && <p>Loading Events...</p>}
       {eventsError && <p className="text-red-500">{eventsError}</p>}
 
@@ -124,15 +124,10 @@ export default function DiscoverPage({ user }) {
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2 mb-6">
-            {popularEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onBookmarkToggle={toggleSaved}
-              />
-            ))}
-          </div>
+          <RecEvents
+            popularEvents={popularEvents}
+            toggleSaved={toggleSaved}
+          ></RecEvents>
 
           {/* saved events */}
           <h2 className="">Saved Events</h2>
@@ -155,6 +150,6 @@ export default function DiscoverPage({ user }) {
           </div>
         </>
       )}
-    </section>
+    </>
   );
 }
