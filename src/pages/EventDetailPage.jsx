@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { getEvent } from "../api/events";
 import { addUserToEvent } from "../api/eventParticipants";
 import { followUser, getMyFollows, unfollowUser } from "../api/auth";
-import { GetEventImg } from "../api/images";
-
+import { GetEventImg, uploadImage } from "../api/images";
+import ImageUpload from "../components/ImageUpload";
 // Main component for displaying the details of a single event
 export default function EventDetailPage({ user, getAccessToken }) {
   const [Event, setEvent] = useState(null);
@@ -17,9 +17,36 @@ export default function EventDetailPage({ user, getAccessToken }) {
   const [followError, setFollowError] = useState("");
   const [images, setImages] = useState([]);
 
-
   // Grab the event ID directly from the webpage URL
   const { id } = useParams();
+
+   // File states
+  const [file, setFile] = useState(null);
+  const [fileError, setFileError] = useState("");
+
+  // file constraints
+  const MAX_FILE_SIZE = 2 * 1024 * 1024;
+  const ALLOWED_TYPES = ["image/jpeg", "image/webp"];
+
+  // handleFileChange function
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) {
+      setFileError("No file selected");
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+      setFileError("Please select a jpeg or webp file");
+      return;
+    }
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      setFileError("File must be under 2MB");
+      return;
+    }
+    setFile(selectedFile);
+    setFileError("");
+  };
+
 
   useEffect(() => {
     getEvent(id)
@@ -98,7 +125,6 @@ export default function EventDetailPage({ user, getAccessToken }) {
   const handleJoinEvent = async () => {
     try {
       const res = await addUserToEvent(user.id, Event.id);
-
       if (res.ok) {
         console.log("Successfully joined!");
 
@@ -129,7 +155,7 @@ export default function EventDetailPage({ user, getAccessToken }) {
     };
 
     fetchImages();
-  }, [id]);
+  }, [id, file]);
 
   // Toggles following the event organizer when the button is pressed
   async function handleFollowToggle() {
@@ -187,6 +213,18 @@ export default function EventDetailPage({ user, getAccessToken }) {
   const organizerInitial = Event.organizer ? event.organizer.charAt(0) : "?";
   const { date, time } = formatDateTime(Event.time);
 
+async function handleUpload() {
+  if (file) {
+    try {
+      const publicId = `user/${user.id}/event/${Event.id}`;
+      console.log(await uploadImage(file, publicId, user.id, Event.id));
+      setFile(null); // Clear file after upload
+      
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+}
   //tailwind styles
   const grid_div =
     "bg-[#f8d8aa] p-4 rounded-2xl shadow-sm border border-[#d8cdb6]";
@@ -195,9 +233,27 @@ export default function EventDetailPage({ user, getAccessToken }) {
 
   return (
     <>
-    {/* {console.log(images[0].url)} */}
+      {console.log(images)}
       <section className={`h-60 flex flex-col items-center justify-end`}>
-        <img className="h-full w-full object-center object-cover rounded-2xl" src={images[0]?.url}></img>
+        {images.length===0 ? (
+          <section className="h-full w-full flex pb-1 flex-col items-center rounded-2xl border-2 bg-amber-200">
+            {/*Add image to the event */}
+            <ImageUpload
+              className="w-80 p-2 flex flex-col items-center"
+              label="Upload Photo"
+              name="eventPhoto"
+              onChange={handleFileChange}
+              error={fileError}
+              accept=".jpg,.jpeg,.webp,image/jpeg,image/webp"
+            />
+            <button className="border-2 cursor-pointer bg-amber-400 p-1 rounded-3xl" onClick={handleUpload}>upload</button>
+          </section>
+        ) : (
+          <img
+            className="h-full w-full object-center object-cover rounded-2xl border-2 bg-amber-200"
+            src={images[0]?.url}
+          ></img>
+        )}
         <h1 className="mt-0 text-3xl font-bold text-[#29272b] leading-tight">
           {Event.name}
         </h1>

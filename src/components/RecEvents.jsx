@@ -34,7 +34,7 @@ function RecEvents({ popularEvents, toggleSaved }) {
 
   return (
     <div
-      className="relative flex flex-col items-center gap-1 mb-4"
+      className="relative flex flex-col h-[65vh] items-center gap-1 mb-4"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -62,7 +62,7 @@ function RecEvents({ popularEvents, toggleSaved }) {
               key={index}
               onClick={() => setCurrentPage(index)}
               className={`w-2 h-2 rounded-full transition-all ${
-                currentPage === index ? "bg-yellow-400" : "bg-amber-300"
+                currentPage === index ? "bg-yellow-500" : "bg-amber-300"
               }`}
             />
           ))}
