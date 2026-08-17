@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import bookmark from "../assets/interface_icons/bookmark.svg";
+import bookmark from "../assets/interface_icons/star.png";
 import review from "../assets/interface_icons/comment-alt.svg";
 import {GetEventImg} from "../api/images";
 
@@ -23,13 +23,13 @@ function EventCard({ event, onBookmarkToggle, variant }) {
   }, [event.id]);
 
   return (
-    <div className="h-40 rounded-3xl border border-white/20 bg-[#211d30] shadow-2xl shadow-black/20">
+    <div className="h-40 md:h-80 rounded-3xl border border-white/20 bg-[#211d30] shadow-2xl shadow-black/20">
       <Link
         className="relative rounded-3xl w-full h-full flex flex-col items-center justify-end"
         to={`/events/${event.id}`}
       >
-        <img className=" rounded-3xl w-full h-25 " src={images[0]?.url} ></img>
-        <section className="flex flex-col items-center rounded-b-3xl w-full text-[0.8rem] h-15 bg-amber-50">
+        <img className=" rounded-t-3xl w-full h-full " src={images[0]?.url} ></img>
+        <section className="flex flex-col items-center rounded-b-3xl w-full text-[0.8rem] h-20 bg-amber-50">
           <p className="pt-0.5 text-[1.2rem] text-wrap line-clamp-1 overflow-x-hidden font-extrabold">{event.name}</p>
           <p className="w-fit p-[0.3rem] m-0 text-xs bg-amber-200 rounded-4xl">{event.category}</p>
         </section>
@@ -48,7 +48,7 @@ function EventCard({ event, onBookmarkToggle, variant }) {
               onBookmarkToggle(event.id);
             }}
           >
-            <img className="size-7" src={bookmark}></img>
+            <img className="size-7 cursor-pointer" src={bookmark}></img>
           </button>
         )}
       </Link>
