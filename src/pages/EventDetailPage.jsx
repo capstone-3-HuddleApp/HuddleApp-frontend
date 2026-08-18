@@ -160,12 +160,9 @@ export default function EventDetailPage({ user, getAccessToken, setGuestId }) {
    * setFollowLoading/setFollowError/setCreatorInfo manage UI state
    *
    * */
-  
 
   useEffect(() => {
-    
-
-    console.log(user.id === Event?.creator_id)
+    console.log(user.id === Event?.creator_id);
 
     let ignoreResult = false;
 
@@ -291,20 +288,22 @@ export default function EventDetailPage({ user, getAccessToken, setGuestId }) {
         {images.length === 0 ? (
           <section className="h-2/3 w-full flex pb-1 flex-col items-center rounded-2xl border-2 bg-amber-200">
             {/*Add image to the event */}
-            <ImageUpload
-              className="w-80 p-2 flex flex-col items-center"
-              label="Upload Photo"
-              name="eventPhoto"
-              onChange={handleFileChange}
-              error={fileError}
-              accept=".jpg,.jpeg,.webp,image/jpeg,image/webp"
-            />
-            <button
-              className="border-2 cursor-pointer bg-amber-400 p-1 rounded-3xl"
-              onClick={handleUpload}
-            >
-              upload
-            </button>
+            <span className={`${user.id === Event?.creator_id? '': 'hidden'}`}>
+              <ImageUpload
+                className="w-80 p-2 flex flex-col items-center"
+                label="Upload Photo"
+                name="eventPhoto"
+                onChange={handleFileChange}
+                error={fileError}
+                accept=".jpg,.jpeg,.webp,image/jpeg,image/webp"
+              />
+              <button
+                className="border-2 cursor-pointer bg-amber-400 p-1 rounded-3xl"
+                onClick={handleUpload}
+              >
+                upload
+              </button>
+            </span>
           </section>
         ) : (
           <img
@@ -382,7 +381,11 @@ export default function EventDetailPage({ user, getAccessToken, setGuestId }) {
       <div className="space-y-4 mt-4 mb-4">
         {/* Organizer profile card with an avatar and a follow button */}
         <div className={`${grid_div} flex items-center justify-around`}>
-          <NavLink className="flex items-center gap-3" to={"/profile/guest"} onClick={()=>setGuestId(Event.creator_id)}>
+          <NavLink
+            className="flex items-center gap-3"
+            to={"/profile/guest"}
+            onClick={() => setGuestId(Event.creator_id)}
+          >
             {user.id !== Event.creator_id && (
               <div className="w-10 h-10 bg-[#cfd894] rounded-full flex items-center justify-center text-[#163b2d] font-bold text-lg">
                 {organizerInitial}

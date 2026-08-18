@@ -4,7 +4,7 @@ import ProfileStats from "../components/ProfileStats";
 import ProfileEventHistory from "../components/Profile/ProfileEventHistory";
 
 import { useEffect, useState } from "react";
-import { getEventsParticipating, getGuestEvents } from "../api/events";
+import { getGuestEvents } from "../api/events";
 import { getMyFollows} from "../api/auth";
 
 
