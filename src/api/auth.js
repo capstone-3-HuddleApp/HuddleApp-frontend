@@ -175,3 +175,97 @@ export async function getProtected(token) {
 
   return res.json();
 }
+
+// Updates editable fields for the currently authenticated user's profile
+export async function updateMyProfile(profile, token) {
+  const res = await fetch(`${BASE_URL}/api/users/me`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(profile),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not update profile (${res.status})`);
+  }
+
+  return res.json();
+}
+
+// Gets the logged-in users follower and following lists
+export async function getMyFollows(id, token) {
+  const res = await fetch(`${BASE_URL}/api/users/me/follows/${id}`, {
+    credentials: "include",
+    headers: {
+      "Content-Type" : "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not load follows (${res.status})`);
+  }
+
+  return res.json();
+}
+
+// Follows another user by their user ID
+export async function followUser(userId, token) {
+  const res = await fetch(`${BASE_URL}/api/users/${userId}/follow`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not follow user (${res.status})`);
+  }
+
+  return res.json();
+}
+
+// Unfollows another user by their user ID
+export async function unfollowUser(userId, token) {
+  const res = await fetch(`${BASE_URL}/api/users/${userId}/follow`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not unfollow user (${res.status})`);
+  }
+
+  return res.json();
+}
+
+//Get user name by id
+export async function whoAmI(id, token) {
+  const res = await fetch(`${BASE_URL}/api/users/whoAmI/${id}`, {
+    credentials: "include",
+    headers: {
+      "Content-Type" : "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not load username (${res.status})`);
+  }
+
+  return res.json();
+}

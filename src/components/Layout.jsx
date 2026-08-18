@@ -15,13 +15,13 @@ let location = useLocation()
     <div className="flex flex-col min-h-screen relative">
       {/**Fixed top navbar */}
       <Navbar
-        className="fixed top-0 left-0 right-0 z-50 bg-gray-950"
+        className="fixed top-0 left-0 right-0 z-50 bg-[#fff9df]"
         user={user}
         onLogout={onLogout}
       />
 
       {/* Scrollable Main (with padding for fixed elements) */}
-      <div className={`mx-auto w-full max-w-3xl flex-1 px-4 pt-1 mt-20 mb-20 overflow-y-hidden ${location.pathname.startsWith("/room/")? 'flex flex-col-reverse' : ''}`}>
+      <div className={`w-full flex-1 px-4 pt-1 mt-20 mb-20 overflow-y-hidden ${location.pathname.startsWith("/room/")? 'flex flex-col-reverse' : ''}`}>
         {authError && (
           <p
             role="alert"

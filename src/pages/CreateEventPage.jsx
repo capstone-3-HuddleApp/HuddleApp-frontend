@@ -6,9 +6,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
 import FormField from "../components/FormField";
+import ImageUpload from "../components/ImageUpload";
 import SelectField from "../components/SelectField";
 import { createEvent } from "../api/events";
 import { searchFacilities } from "../api/facilities";
+import { uploadImage } from "../api/images";
 
 // Fields the backend requires (facilities_id included) — everything except
 // description. Checked client-side before we ever hit the network, so the
@@ -50,8 +52,37 @@ function toDateTimeLocal(date) {
   return localDate.toISOString().slice(0, 16); //drom seconds + "Z"
 }
 
-export default function CreateEventPage() {
+export default function CreateEventPage({ user }) {
   const navigate = useNavigate();
+
+  // File states
+  const [file, setFile] = useState(null);
+  const [fileError, setFileError] = useState("");
+
+  // file constraints
+  const MAX_FILE_SIZE = 2 * 1024 * 1024;
+  const ALLOWED_TYPES = ["image/jpeg", "image/webp"];
+
+  // handleFileChange function
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) {
+      setFileError("No file selected");
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+      setFileError("Please select a jpeg or webp file");
+      return;
+    }
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      setFileError("File must be under 2MB");
+      return;
+    }
+    setFile(selectedFile);
+    setFileError("");
+  };
+
+  // Move the ImageUpload component into your form
 
   const [formData, setFormData] = useState({
     name: "",
@@ -102,7 +133,7 @@ export default function CreateEventPage() {
       // that selection may no longer be valid — clear it so the user can't
       // accidentally submit a facilities_id that doesn't match what's typed.
       if (name === "location" && value !== selectedLocationRef.current) {
-        next.facilities_id = ""
+        next.facilities_id = "";
       }
 
       return next;
@@ -131,7 +162,7 @@ export default function CreateEventPage() {
       setIsSearching(true);
       setSearchError("");
 
-      console.log(location)
+      console.log(location);
 
       try {
         const facgroup = CATEGORY_TO_FACGROUP[formData.category];
@@ -215,6 +246,11 @@ export default function CreateEventPage() {
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
 
+    if (fileError) {
+      setSubmitError("Please upload a valid image");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // description is optional — send undefined instead of '' so the
@@ -224,6 +260,12 @@ export default function CreateEventPage() {
         ...formData,
         description: formData.description.trim() || undefined,
       });
+
+      //upload the image after creating the event
+      if (file) {
+        const publicId = `user/${user.id}/event/${event.id}`;
+        await uploadImage(file, publicId, user.id, event.id);
+      }
       navigate(`/events/${event.id}`);
     } catch (err) {
       setSubmitError(err.message);
@@ -233,8 +275,7 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md">
-      <h1 className="mb-6 text-2xl font-bold text-white">Create an event</h1>
+    <div className="mx-auto max-w-md pt-5">
 
       {submitError && (
         <p
@@ -292,11 +333,11 @@ export default function CreateEventPage() {
             value={formData.location}
             onChange={handleChange}
             error={errors.location}
-            placeholder = "Search location"
+            placeholder="Search location"
             required
           />
           {isSearching && (
-            <p className="mt-1 text-xs text-[#777087]">Searching…</p>
+            <p className="mt-1 text-xs text-[#7d8794]">Searching…</p>
           )}
 
           {searchError && (
@@ -306,18 +347,18 @@ export default function CreateEventPage() {
           )}
 
           {suggestions.length > 0 && (
-            <ul className="absolute z-10 mt-1 w-full h-60 overflow-y-scroll rounded-xl border border-white/10 bg-[#17141f] shadow-lg">
+            <ul className="absolute z-10 mt-1 w-full h-60 overflow-y-scroll rounded-xl border border-[#d8cdb6] bg-[#fff9df] shadow-lg">
               {suggestions.map((facility) => (
                 <li key={facility.uid}>
                   <button
                     type="button"
                     onClick={() => handleSelectFacility(facility)}
-                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-violet-500/20"
+                    className="w-full px-4 py-2 text-left text-sm text-[#29272b] hover:bg-[#f2a451]/20"
                   >
                     <span className="block font-semibold">
                       {facility.facname}
                     </span>
-                    <span className="block text-xs text-[#777087]">
+                    <span className="block text-xs text-[#7d8794]">
                       {facility.address}, {facility.city}
                     </span>
                   </button>
@@ -326,7 +367,6 @@ export default function CreateEventPage() {
             </ul>
           )}
         </div>
-
 
         <span className="flex flex-row gap-1 items-start w-full">
           <FormField
@@ -359,15 +399,29 @@ export default function CreateEventPage() {
           error={errors.description}
         />
 
-        <FormField
-            className="w-[60%]"
-            label="Max Participants (optional)"
-            name="maxParticipants"
-            value={formData.maxParticipants}
-            onChange={handleChange}
-            error={errors.maxParticipants}
-            required
-          />
+        <span className="flex flex-row gap-1">
+          <FormField
+          className="w-[60%]"
+          label="Max Participants"
+          name="maxParticipants"
+          value={formData.maxParticipants}
+          onChange={handleChange}
+          error={errors.maxParticipants}
+          required
+        />
+
+        {/*Add image to the event */}
+        <ImageUpload
+          className=""
+          label="Event Photo"
+          name="eventPhoto"
+          onChange={handleFileChange}
+          error={fileError}
+          accept=".jpg,.jpeg,.webp,image/jpeg,image/webp"
+        />
+        </span>
+
+        
 
         {/* facilities hidden, auto filled up when user chooses a location*/}
         <FormField
@@ -383,7 +437,7 @@ export default function CreateEventPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-2 rounded-xl bg-violet-500 py-3 text-sm font-semibold text-white transition hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-2 rounded-xl bg-[#f2a451] py-3 text-sm font-semibold text-[#29272b] transition hover:bg-[#e8943e] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? "Creating…" : "Create event"}
         </button>

@@ -21,7 +21,7 @@ export default function SelectField({
 
   return (
     <div className='flex flex-col gap-1.5'>
-      <label htmlFor={name} className='text-sm font-semibold text-[#d8d3e6]'>
+      <label htmlFor={name} className='text-sm font-semibold text-[#29272b]'>
         {label}
       </label>
 
@@ -32,9 +32,9 @@ export default function SelectField({
         onChange={onChange}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
-        className={`w-full rounded-xl border bg-[#17141f]/70 px-4 py-3 text-sm text-white outline-none transition
-          focus:border-violet-400 focus:ring-2 focus:ring-violet-500/20
-          ${error ? 'border-red-500' : 'border-white/10'}`}
+        className={`w-full rounded-xl border bg-[#fff9df]/80 px-4 py-3 text-sm text-[#29272b] outline-none transition
+          focus:border-[#f2a451] focus:ring-2 focus:ring-[#f2a451]/20
+          ${error ? 'border-red-500' : 'border-[#d8cdb6]'}`}
         {...selectProps}
       >
         {/* Disabled placeholder — shown until the user picks something, but

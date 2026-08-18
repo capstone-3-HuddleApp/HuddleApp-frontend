@@ -64,7 +64,7 @@ export default function EventChat({ user }) {
   return (
     <div className="flex flex-col p-4 ">
       {messages.length === 0 ? (
-        <p className="text-center text-gray-500">
+        <p className="text-center text-[#7d8794]">
           No messages yet. Start the conversation!
         </p>
       ) : (
@@ -80,7 +80,7 @@ export default function EventChat({ user }) {
                     setHidden('')
                 }else{setHidden('hidden')}
             }}
-              className={`max-w-xs px-4 py-2 rounded-lg ${msg.user_id === user.id ? "bg-blue-500 text-black" : "bg-gray-300 text-black"}`}
+              className={`max-w-xs px-4 py-2 rounded-lg ${msg.user_id === user.id ? "bg-[#cae4ed] text-[#29272b]" : "bg-[#f8d8aa] text-[#29272b]"}`}
             >
             <p className="text-[0.7rem]">{msg?.sender?.username}</p>
               <p className="text-sm font-semibold">{msg.message}</p>
