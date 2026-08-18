@@ -34,11 +34,11 @@ function RecEvents({ popularEvents, toggleSaved }) {
 
   return (
     <div
-      className="relative flex flex-col h-[65vh] items-center gap-1 mb-4"
+      className="relative flex flex-col items-center gap-1 mb-4"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="w-full h-full grid grid-cols-2 lg:grid-cols-3 gap-3 flex-1 sm:w-[80vw]">
+      <div className="w-full h-full grid grid-cols-2 grid-rows-3 lg:grid-cols-3 gap-3 flex-1 sm:w-[80vw]">
         {paginatedEvents.map((event) => (
           <EventCard
             key={event.id}

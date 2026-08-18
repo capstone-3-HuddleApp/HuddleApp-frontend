@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router";
 import { useAuth0 } from "@auth0/auth0-react";
 import "leaflet/dist/leaflet.css";
-import MapPage from './pages/EventMap';
+
 
 import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
