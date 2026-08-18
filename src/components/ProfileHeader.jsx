@@ -5,9 +5,9 @@ import { useState, useEffect } from "react";
 export default function ProfileHeader({ profile, action }) {
   const [images, setImages] = useState([]);
   const fullName =
-    profile.name ||
-    [profile.f_name, profile.l_name].filter(Boolean).join(" ") ||
-    profile.username;
+    profile?.name ||
+    [profile?.f_name, profile?.l_name].filter(Boolean).join(" ") ||
+    profile?.username;
 
   console.log(profile);
 
@@ -24,7 +24,7 @@ export default function ProfileHeader({ profile, action }) {
     fetchImages();
   }, [profile]);
 
-  const profileInitial = fullName.charAt(0).toUpperCase();
+  const profileInitial = fullName?.charAt(0).toUpperCase();
   // Uses a responsive card that stacks on phones and becomes a row on larger screens.
   return (
     <section className="flex flex-col items-center gap-4 rounded-3xl border border-[#d8cdb6] bg-[#f8d8aa] p-5 text-center shadow-xl sm:flex-row sm:p-6 sm:text-left">

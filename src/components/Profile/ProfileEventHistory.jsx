@@ -19,7 +19,7 @@ export default function ProfileEventHistory({
           Event history
         </h2>
         <p className="mt-1 text-sm text-(--text)">
-          Events you attended in the past.
+          Events you Created in the past.
         </p>
       </div>
 

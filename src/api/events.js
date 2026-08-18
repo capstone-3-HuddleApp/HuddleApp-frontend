@@ -40,6 +40,20 @@ export async function getMyEvents() {
   return res.json();
 }
 
+export async function getGuestEvents(id) {
+  const res = await fetch(`${BASE_URL}/api/events/guest/${id}`, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not load your events (${res.status})`);
+  }
+
+  return res.json();
+}
+
 //READ EVENTS PARTICIPATING- Get /api/events/participating. only evets a user is pariticipating in
 export async function getEventsParticipating() {
   const res = await fetch(`${BASE_URL}/api/events/participating`,{

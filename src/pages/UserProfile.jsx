@@ -131,7 +131,7 @@ export default function UserProfile({
         setFollowsError("");
 
         const token = getAccessToken ? await getAccessToken() : undefined;
-        const data = await getMyFollows(token);
+        const data = await getMyFollows(user.id,token);
 
         if (!ignoreResult) {
           setFollowData(data);

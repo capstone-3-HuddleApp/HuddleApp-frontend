@@ -47,6 +47,7 @@ function App() {
   } = useAuth0();
 
   const [geolocation, setGeolocation] = useState(null);
+  const [guestId, setGuestId]= useState(null);
   // On a page refresh, THREE things can be in flight at once, and
   // ProtectedRoute must not redirect while any of them is still running —
   // otherwise a logged-in user gets bounced to /login every time they hit F5:
@@ -198,6 +199,7 @@ function App() {
             <ProtectedRoute user={user} isLoading={isLoading}>
               <EventDetailPage
                 user={user}
+                setGuestId={setGuestId}
                 getAccessToken={isAuth0User ? getAccessTokenSilently : null}
               />
             </ProtectedRoute>
@@ -227,7 +229,7 @@ function App() {
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
               <GuestProfile
-                user={user}
+                user={guestId}
                 setUser={setUser}
                 getAccessToken={isAuth0User ? getAccessTokenSilently : null}
                 getLocation={getLocation}

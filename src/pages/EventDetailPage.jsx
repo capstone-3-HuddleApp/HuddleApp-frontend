@@ -7,7 +7,7 @@ import { followUser, getMyFollows, unfollowUser, whoAmI } from "../api/auth";
 import { GetEventImg, uploadImage } from "../api/images";
 import ImageUpload from "../components/ImageUpload";
 // Main component for displaying the details of a single event
-export default function EventDetailPage({ user, getAccessToken }) {
+export default function EventDetailPage({ user, getAccessToken, setGuestId }) {
   const [Event, setEvent] = useState(null);
   const [isloading, setLoading] = useState(true);
   const [isParticipating, setParticipating] = useState(false);
@@ -63,10 +63,10 @@ export default function EventDetailPage({ user, getAccessToken }) {
       });
   }, [id, user]);
 
-  console.log(Event)
+  console.log(Event);
   // Checks whether the logged-in user already follows this events organizer
   useEffect(() => {
-    if (!Event || user.id === Event.creator_id) {
+    if (!Event || user.id === Event?.creator_id) {
       return;
     }
 
@@ -78,7 +78,7 @@ export default function EventDetailPage({ user, getAccessToken }) {
         setFollowError("");
 
         const token = getAccessToken ? await getAccessToken() : undefined;
-        const data = await getMyFollows(token);
+        const data = await getMyFollows(user.id, token);
 
         const alreadyFollowing = data.following.some(
           (followedUser) => followedUser.id === Event.creator_id,
@@ -146,51 +146,55 @@ export default function EventDetailPage({ user, getAccessToken }) {
   };
 
   /**
- * $$$-Function Creation: 08/17/2026, [Anaf]
- * $$$-Most Recent Change: 08/17/2026, [Anaf]
- * $$$-Method Description:
- *    Fetches creator information by ID when the event loads. Retrieves
- * the event creator's data using the whoAmI function and manages loading/error
- * states. Includes cleanup to prevent state updates on unmounted components.
- * $$$-Component Using This Function:
- *    Event detail/view components
- * $$$-Description of Variables:
- *    ignoreResult flag prevents state updates after unmount; creatorData stores
- * fetched user info; token obtained from getAccessToken for authorization;
- * setFollowLoading/setFollowError/setCreatorInfo manage UI state
- *
- * */
+   * $$$-Function Creation: 08/17/2026, [Anaf]
+   * $$$-Most Recent Change: 08/17/2026, [Anaf]
+   * $$$-Method Description:
+   *    Fetches creator information by ID when the event loads. Retrieves
+   * the event creator's data using the whoAmI function and manages loading/error
+   * states. Includes cleanup to prevent state updates on unmounted components.
+   * $$$-Component Using This Function:
+   *    Event detail/view components
+   * $$$-Description of Variables:
+   *    ignoreResult flag prevents state updates after unmount; creatorData stores
+   * fetched user info; token obtained from getAccessToken for authorization;
+   * setFollowLoading/setFollowError/setCreatorInfo manage UI state
+   *
+   * */
+  
 
   useEffect(() => {
+    
 
-  let ignoreResult = false;
+    console.log(user.id === Event?.creator_id)
 
-  async function loadCreatorInfo() {
-    try {
+    let ignoreResult = false;
 
-      const token = getAccessToken ? await getAccessToken() : undefined;
-      const creatorData = await whoAmI(Event.creator_id, token);
+    async function loadCreatorInfo() {
+      try {
+        const token = getAccessToken ? await getAccessToken() : undefined;
+        const creatorData = await whoAmI(Event.creator_id, token);
 
-      if (!ignoreResult) {
-        setCreatorInfo(creatorData);
-      }
-    } catch (error) {
-      if (!ignoreResult) {
-        setFollowError(error.message);
-      }
-    } finally {
-      if (!ignoreResult) {
-        setFollowLoading(false);
+        if (!ignoreResult) {
+          console.log(creatorData);
+          setCreatorInfo(creatorData);
+        }
+      } catch (error) {
+        if (!ignoreResult) {
+          setFollowError(error.message);
+        }
+      } finally {
+        if (!ignoreResult) {
+          setFollowLoading(false);
+        }
       }
     }
-  }
 
-  loadCreatorInfo();
+    loadCreatorInfo();
 
-  return () => {
-    ignoreResult = true;
-  };
-}, [Event, user.id, getAccessToken]);
+    return () => {
+      ignoreResult = true;
+    };
+  }, [Event, user.id, getAccessToken]);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -378,7 +382,7 @@ export default function EventDetailPage({ user, getAccessToken }) {
       <div className="space-y-4 mt-4 mb-4">
         {/* Organizer profile card with an avatar and a follow button */}
         <div className={`${grid_div} flex items-center justify-around`}>
-          <NavLink className="flex items-center gap-3" to={'/profile/guest'}>
+          <NavLink className="flex items-center gap-3" to={"/profile/guest"} onClick={()=>setGuestId(Event.creator_id)}>
             {user.id !== Event.creator_id && (
               <div className="w-10 h-10 bg-[#cfd894] rounded-full flex items-center justify-center text-[#163b2d] font-bold text-lg">
                 {organizerInitial}
@@ -389,7 +393,9 @@ export default function EventDetailPage({ user, getAccessToken }) {
               <p className="text-xs text-[#566474] font-bold uppercase tracking-wider">
                 Organized By
               </p>
-              <p className="font-bold text-[#29272b]">{creatorInfo?.username}</p>
+              <p className="font-bold text-[#29272b]">
+                {creatorInfo?.username}
+              </p>
             </div>
           </NavLink>
           {user.id !== Event.creator_id && (

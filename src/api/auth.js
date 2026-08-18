@@ -197,8 +197,8 @@ export async function updateMyProfile(profile, token) {
 }
 
 // Gets the logged-in users follower and following lists
-export async function getMyFollows(token) {
-  const res = await fetch(`${BASE_URL}/api/users/me/follows`, {
+export async function getMyFollows(id, token) {
+  const res = await fetch(`${BASE_URL}/api/users/me/follows/${id}`, {
     credentials: "include",
     headers: {
       "Content-Type" : "application/json",
@@ -254,7 +254,7 @@ export async function unfollowUser(userId, token) {
 
 //Get user name by id
 export async function whoAmI(id, token) {
-  const res = await fetch(`${BASE_URL}/api/users/whoAmI`, {
+  const res = await fetch(`${BASE_URL}/api/users/whoAmI/${id}`, {
     credentials: "include",
     headers: {
       "Content-Type" : "application/json",
