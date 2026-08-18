@@ -152,10 +152,10 @@ export default function UserProfile({
     return () => {
       ignoreResult = true;
     };
-  }, [getAccessToken]);
+  }, [getAccessToken, user]);
 
   // Separates completed events from the user's complete joined-event list
-  const pastEvents = joinedEvents.filter(
+  const pastEventsParticipated = joinedEvents.filter(
     (event) => new Date(event.time) < new Date(),
   );
 
@@ -278,7 +278,7 @@ export default function UserProfile({
       <ProfileEventHistory
         eventsLoading={eventsLoading}
         eventsError={eventsError}
-        pastEvents={pastEvents}
+        participatingEvents={pastEventsParticipated}
       />
 
       {/* Keeps private account tools separate from what the public will see on profile page */}

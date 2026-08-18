@@ -7,13 +7,18 @@
  * $$$-Parent Component:
  *    Profile
  */
+
+import PrevEvents from "../PrevEvents";
 export default function ProfileEventHistory({
   eventsLoading,
   eventsError,
   pastEvents,
+  participatingEvents=null,
 }) {
   return (
-    <section className="mt-5 rounded-2xl border border-[#d8cdb6] bg-[#f8d8aa] p-5 sm:p-6">
+    
+    (
+      pastEvents && <section className="mt-5 rounded-2xl border border-[#d8cdb6] bg-[#f8d8aa] p-5 sm:p-6">
       <div>
         <h2 className="text-xl font-extrabold text-(--text-h) sm:text-2xl">
           Event history
@@ -55,5 +60,9 @@ export default function ProfileEventHistory({
         </ul>
       )}
     </section>
+    ),
+
+    (participatingEvents && <PrevEvents popularEvents={participatingEvents}></PrevEvents>)
+
   );
 }

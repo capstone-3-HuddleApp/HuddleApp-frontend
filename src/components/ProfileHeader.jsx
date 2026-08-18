@@ -12,6 +12,7 @@ export default function ProfileHeader({ profile, action }) {
   console.log(profile);
 
   useEffect(() => {
+    if(!profile) return
     const fetchImages = async () => {
       try {
         const fetchedImages = await GetProfileImg(profile.id);
