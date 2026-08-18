@@ -251,3 +251,21 @@ export async function unfollowUser(userId, token) {
 
   return res.json();
 }
+
+//Get user name by id
+export async function whoAmI(id, token) {
+  const res = await fetch(`${BASE_URL}/api/users/whoAmI`, {
+    credentials: "include",
+    headers: {
+      "Content-Type" : "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not load username (${res.status})`);
+  }
+
+  return res.json();
+}

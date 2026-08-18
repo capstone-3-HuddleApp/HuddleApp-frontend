@@ -3,14 +3,14 @@ import { Routes, Route } from "react-router";
 import { useAuth0 } from "@auth0/auth0-react";
 import "leaflet/dist/leaflet.css";
 
-
 import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import DiscoverPage from "./pages/DiscoverPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import EventDetailPage from "./pages/EventDetailPage";
-import Profile from "./pages/Profile";
+import GuestProfile from "./pages/GuestProfile";
+import UserProfile from './pages/UserProfile'
 import ChatRoom from "./pages/ChatRooms";
 import EventMap from "./pages/EventMap";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -149,7 +149,7 @@ function App() {
   return (
     <Routes>
       {/* Every route below renders inside Layout (navbar + page slot). */}
-      
+
       <Route
         element={
           <Layout user={user} onLogout={handleLogout} authError={authError} />
@@ -173,12 +173,12 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/map"
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <EventMap/>
+              <EventMap />
             </ProtectedRoute>
           }
         />
@@ -213,7 +213,6 @@ function App() {
           }
         ></Route>
 
-
         <Route
           path={`/room/:eventId`}
           element={
@@ -224,16 +223,31 @@ function App() {
         ></Route>
 
         <Route
-          path={`/profile`}
+          path={`/profile/guest`}
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <Profile
+              <GuestProfile
                 user={user}
                 setUser={setUser}
                 getAccessToken={isAuth0User ? getAccessTokenSilently : null}
                 getLocation={getLocation}
                 geolocation={geolocation}
-              ></Profile>
+              ></GuestProfile>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+        <Route
+          path={`/profile`}
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <UserProfile
+                user={user}
+                setUser={setUser}
+                getAccessToken={isAuth0User ? getAccessTokenSilently : null}
+                getLocation={getLocation}
+                geolocation={geolocation}
+              ></UserProfile>
             </ProtectedRoute>
           }
         ></Route>

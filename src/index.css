@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-@layer reset {
+/* @layer theme {
   *,
   *::before,
   *::after {
@@ -43,7 +43,7 @@
     border-collapse: collapse;
   }
 }
-
+ */
 
 
 :root {

@@ -34,7 +34,7 @@ function RecEvents({ popularEvents, toggleSaved }) {
 
   return (
     <div
-      className="relative flex flex-col items-center gap-1 mb-4"
+      className="mb-4 md:flex md:flex-col"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >

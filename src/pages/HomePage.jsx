@@ -8,7 +8,7 @@ export default function HomePage() {
         <h2 className="text-sm font-medium text-[#7d8794]">
           Find your people, no fee required
         </h2>
-        <p className="!p-10 text-sm leading-relaxed text-[#29272b]">
+        <p className="p-10 text-sm leading-relaxed text-[#29272b]">
           A free, community-run alternative to paid event platforms — helping
           college students and working adults discover and organize pickup
           sports, hobby meetups, and hangouts at public venues, with decisions
