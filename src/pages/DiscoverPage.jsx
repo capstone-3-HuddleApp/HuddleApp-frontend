@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 // import { useAuth0 } from "@auth0/auth0-react";
 // import { getProtected } from "../api/auth";
 import { getEvents } from "../api/events";
-import { addUserToEvent } from "../api/eventParticipants";
+
 import EventCard from "../components/EventCard";
 import RecEvents from "../components/RecEvents";
+import SavedEvents from "../components/SavedEvents";
 
 // A page to TEST the protected backend endpoint. ProtectedRoute makes sure you
 // can only get here when logged in; the button then calls /api/protected and
@@ -130,16 +131,7 @@ export default function DiscoverPage({ user }) {
           ></RecEvents>
 
           {/* saved events */}
-          <h2 className="">Saved Events</h2>
-          <div className="grid grid-cols-2 gap-2 mb-20">
-            {savedEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onBookmarkToggle={toggleSaved}
-              />
-            ))}
-          </div>
+          <SavedEvents savedEvents={savedEvents} toggleSaved={toggleSaved} />
 
           {/* past events */}
           <h2 className="">Past Events</h2>

@@ -3,14 +3,14 @@ import { Routes, Route } from "react-router";
 import { useAuth0 } from "@auth0/auth0-react";
 import "leaflet/dist/leaflet.css";
 
-
 import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import DiscoverPage from "./pages/DiscoverPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import EventDetailPage from "./pages/EventDetailPage";
-import Profile from "./pages/Profile";
+import GuestProfile from "./pages/GuestProfile";
+import UserProfile from './pages/UserProfile'
 import ChatRoom from "./pages/ChatRooms";
 import EventMap from "./pages/EventMap";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -47,6 +47,7 @@ function App() {
   } = useAuth0();
 
   const [geolocation, setGeolocation] = useState(null);
+  const [guestId, setGuestId]= useState(null);
   // On a page refresh, THREE things can be in flight at once, and
   // ProtectedRoute must not redirect while any of them is still running —
   // otherwise a logged-in user gets bounced to /login every time they hit F5:
@@ -149,7 +150,7 @@ function App() {
   return (
     <Routes>
       {/* Every route below renders inside Layout (navbar + page slot). */}
-      
+
       <Route
         element={
           <Layout user={user} onLogout={handleLogout} authError={authError} />
@@ -173,12 +174,12 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/map"
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <EventMap/>
+              <EventMap />
             </ProtectedRoute>
           }
         />
@@ -198,6 +199,7 @@ function App() {
             <ProtectedRoute user={user} isLoading={isLoading}>
               <EventDetailPage
                 user={user}
+                setGuestId={setGuestId}
                 getAccessToken={isAuth0User ? getAccessTokenSilently : null}
               />
             </ProtectedRoute>
@@ -213,7 +215,6 @@ function App() {
           }
         ></Route>
 
-
         <Route
           path={`/room/:eventId`}
           element={
@@ -224,16 +225,31 @@ function App() {
         ></Route>
 
         <Route
+          path={`/profile/guest`}
+          element={
+            <ProtectedRoute user={user} isLoading={isLoading}>
+              <GuestProfile
+                user={guestId}
+                setUser={setUser}
+                getAccessToken={isAuth0User ? getAccessTokenSilently : null}
+                getLocation={getLocation}
+                geolocation={geolocation}
+              ></GuestProfile>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+        <Route
           path={`/profile`}
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <Profile
+              <UserProfile
                 user={user}
                 setUser={setUser}
                 getAccessToken={isAuth0User ? getAccessTokenSilently : null}
                 getLocation={getLocation}
                 geolocation={geolocation}
-              ></Profile>
+              ></UserProfile>
             </ProtectedRoute>
           }
         ></Route>

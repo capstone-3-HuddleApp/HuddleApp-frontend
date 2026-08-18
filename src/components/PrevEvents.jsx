@@ -5,7 +5,7 @@ import arrow from "../assets/interface_icons/arrow.svg";
 function RecEvents({ popularEvents, toggleSaved }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
-  const itemsPerPage = 6;
+  const itemsPerPage = 2;
 
   const start = currentPage * itemsPerPage;
   const paginatedEvents = popularEvents.slice(start, start + itemsPerPage);
@@ -34,11 +34,11 @@ function RecEvents({ popularEvents, toggleSaved }) {
 
   return (
     <div
-      className="mb-4 md:flex md:flex-col"
+      className="mb-2 mt-4 md:flex md:flex-col"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="w-full h-full grid grid-cols-2 grid-rows-3 lg:grid-cols-3 gap-3 flex-1 sm:w-[80vw]">
+      <div className="w-full h-full grid grid-cols-2 grid-rows-2 lg:grid-cols-3 gap-3 flex-1 sm:w-[80vw]">
         {paginatedEvents.map((event) => (
           <EventCard
             key={event.id}

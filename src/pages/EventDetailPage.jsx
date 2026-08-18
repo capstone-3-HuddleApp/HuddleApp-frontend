@@ -1,13 +1,13 @@
 // Import necessary tools from React Router for navigation and reading the URL
-import { useParams, Link } from "react-router";
+import { useParams, Link, NavLink } from "react-router";
 import { useEffect, useState } from "react";
 import { getEvent } from "../api/events";
 import { addUserToEvent } from "../api/eventParticipants";
-import { followUser, getMyFollows, unfollowUser } from "../api/auth";
+import { followUser, getMyFollows, unfollowUser, whoAmI } from "../api/auth";
 import { GetEventImg, uploadImage } from "../api/images";
 import ImageUpload from "../components/ImageUpload";
 // Main component for displaying the details of a single event
-export default function EventDetailPage({ user, getAccessToken }) {
+export default function EventDetailPage({ user, getAccessToken, setGuestId }) {
   const [Event, setEvent] = useState(null);
   const [isloading, setLoading] = useState(true);
   const [isParticipating, setParticipating] = useState(false);
@@ -15,12 +15,13 @@ export default function EventDetailPage({ user, getAccessToken }) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(true);
   const [followError, setFollowError] = useState("");
+  const [creatorInfo, setCreatorInfo] = useState(null);
   const [images, setImages] = useState([]);
 
   // Grab the event ID directly from the webpage URL
   const { id } = useParams();
 
-   // File states
+  // File states
   const [file, setFile] = useState(null);
   const [fileError, setFileError] = useState("");
 
@@ -47,7 +48,6 @@ export default function EventDetailPage({ user, getAccessToken }) {
     setFileError("");
   };
 
-
   useEffect(() => {
     getEvent(id)
       .then((data) => {
@@ -63,9 +63,10 @@ export default function EventDetailPage({ user, getAccessToken }) {
       });
   }, [id, user]);
 
+  console.log(Event);
   // Checks whether the logged-in user already follows this events organizer
   useEffect(() => {
-    if (!Event || user.id === Event.creator_id) {
+    if (!Event || user.id === Event?.creator_id) {
       return;
     }
 
@@ -77,7 +78,7 @@ export default function EventDetailPage({ user, getAccessToken }) {
         setFollowError("");
 
         const token = getAccessToken ? await getAccessToken() : undefined;
-        const data = await getMyFollows(token);
+        const data = await getMyFollows(user.id, token);
 
         const alreadyFollowing = data.following.some(
           (followedUser) => followedUser.id === Event.creator_id,
@@ -143,6 +144,54 @@ export default function EventDetailPage({ user, getAccessToken }) {
       console.error("Failed to join:", error);
     }
   };
+
+  /**
+   * $$$-Function Creation: 08/17/2026, [Anaf]
+   * $$$-Most Recent Change: 08/17/2026, [Anaf]
+   * $$$-Method Description:
+   *    Fetches creator information by ID when the event loads. Retrieves
+   * the event creator's data using the whoAmI function and manages loading/error
+   * states. Includes cleanup to prevent state updates on unmounted components.
+   * $$$-Component Using This Function:
+   *    Event detail/view components
+   * $$$-Description of Variables:
+   *    ignoreResult flag prevents state updates after unmount; creatorData stores
+   * fetched user info; token obtained from getAccessToken for authorization;
+   * setFollowLoading/setFollowError/setCreatorInfo manage UI state
+   *
+   * */
+
+  useEffect(() => {
+    console.log(user.id === Event?.creator_id);
+
+    let ignoreResult = false;
+
+    async function loadCreatorInfo() {
+      try {
+        const token = getAccessToken ? await getAccessToken() : undefined;
+        const creatorData = await whoAmI(Event.creator_id, token);
+
+        if (!ignoreResult) {
+          console.log(creatorData);
+          setCreatorInfo(creatorData);
+        }
+      } catch (error) {
+        if (!ignoreResult) {
+          setFollowError(error.message);
+        }
+      } finally {
+        if (!ignoreResult) {
+          setFollowLoading(false);
+        }
+      }
+    }
+
+    loadCreatorInfo();
+
+    return () => {
+      ignoreResult = true;
+    };
+  }, [Event, user.id, getAccessToken]);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -213,18 +262,17 @@ export default function EventDetailPage({ user, getAccessToken }) {
   const organizerInitial = Event.organizer ? event.organizer.charAt(0) : "?";
   const { date, time } = formatDateTime(Event.time);
 
-async function handleUpload() {
-  if (file) {
-    try {
-      const publicId = `user/${user.id}/event/${Event.id}`;
-      console.log(await uploadImage(file, publicId, user.id, Event.id));
-      setFile(null); // Clear file after upload
-      
-    } catch (err) {
-      setError(err.message);
+  async function handleUpload() {
+    if (file) {
+      try {
+        const publicId = `user/${user.id}/event/${Event.id}`;
+        console.log(await uploadImage(file, publicId, user.id, Event.id));
+        setFile(null); // Clear file after upload
+      } catch (err) {
+        setError(err.message);
+      }
     }
   }
-}
   //tailwind styles
   const grid_div =
     "bg-[#f8d8aa] p-4 rounded-2xl shadow-sm border border-[#d8cdb6]";
@@ -234,32 +282,43 @@ async function handleUpload() {
   return (
     <>
       {console.log(images)}
-      <section className={`h-60 flex flex-col items-center justify-end`}>
-        {images.length===0 ? (
-          <section className="h-full w-full flex pb-1 flex-col items-center rounded-2xl border-2 bg-amber-200">
+      <section
+        className={`h-80 flex flex-col items-center justify-end overflow-hidden`}
+      >
+        {images.length === 0 ? (
+          <section className="h-2/3 w-full flex pb-1 flex-col items-center rounded-2xl border-2 bg-amber-200">
             {/*Add image to the event */}
-            <ImageUpload
-              className="w-80 p-2 flex flex-col items-center"
-              label="Upload Photo"
-              name="eventPhoto"
-              onChange={handleFileChange}
-              error={fileError}
-              accept=".jpg,.jpeg,.webp,image/jpeg,image/webp"
-            />
-            <button className="border-2 cursor-pointer bg-amber-400 p-1 rounded-3xl" onClick={handleUpload}>upload</button>
+            <span className={`${user.id === Event?.creator_id? '': 'hidden'}`}>
+              <ImageUpload
+                className="w-80 p-2 flex flex-col items-center"
+                label="Upload Photo"
+                name="eventPhoto"
+                onChange={handleFileChange}
+                error={fileError}
+                accept=".jpg,.jpeg,.webp,image/jpeg,image/webp"
+              />
+              <button
+                className="border-2 cursor-pointer bg-amber-400 p-1 rounded-3xl"
+                onClick={handleUpload}
+              >
+                upload
+              </button>
+            </span>
           </section>
         ) : (
           <img
-            className="h-full w-full object-center object-cover rounded-2xl border-2 bg-amber-200"
+            className="h-2/3 w-full object-center object-cover rounded-2xl border-2 bg-amber-200"
             src={images[0]?.url}
           ></img>
         )}
-        <h1 className="mt-0 text-3xl font-bold text-[#29272b] leading-tight">
-          {Event.name}
-        </h1>
-        <span className="border-2 border-[#d18a32] bg-[#ffe991] rounded-2xl p-1 pl-2 pr-2 text-[#29272b]">
-          {capitalizeFirst(Event.category)}
-        </span>
+        <section className="h-1/3">
+          <h1 className="mt-0 text-3xl font-bold text-[#29272b] leading-tight">
+            {Event.name}
+          </h1>
+          <span className="border-2 border-[#d18a32] bg-[#ffe991] rounded-2xl p-1 pl-2 pr-2 text-[#29272b]">
+            {capitalizeFirst(Event.category)}
+          </span>
+        </section>
       </section>
 
       {/*Grid displaying date, time, address and category */}
@@ -322,7 +381,11 @@ async function handleUpload() {
       <div className="space-y-4 mt-4 mb-4">
         {/* Organizer profile card with an avatar and a follow button */}
         <div className={`${grid_div} flex items-center justify-around`}>
-          <div className="flex items-center gap-3">
+          <NavLink
+            className="flex items-center gap-3"
+            to={"/profile/guest"}
+            onClick={() => setGuestId(Event.creator_id)}
+          >
             {user.id !== Event.creator_id && (
               <div className="w-10 h-10 bg-[#cfd894] rounded-full flex items-center justify-center text-[#163b2d] font-bold text-lg">
                 {organizerInitial}
@@ -333,9 +396,11 @@ async function handleUpload() {
               <p className="text-xs text-[#566474] font-bold uppercase tracking-wider">
                 Organized By
               </p>
-              <p className="font-bold text-[#29272b]">TBD</p>
+              <p className="font-bold text-[#29272b]">
+                {creatorInfo?.username}
+              </p>
             </div>
-          </div>
+          </NavLink>
           {user.id !== Event.creator_id && (
             <div className="flex flex-col items-center gap-1">
               <button
