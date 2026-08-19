@@ -176,6 +176,22 @@ export async function getProtected(token) {
   return res.json();
 }
 
+
+
+const cache = {
+  userFollows: {}, // keyed by userId
+  userInfo: {}, // keyed by userId (whoAmI)
+  lastFetch: {},
+};
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+function isCacheValid(key) {
+  return cache.lastFetch[key] && Date.now() - cache.lastFetch[key] < CACHE_DURATION;
+}
+
+
+
 // Updates editable fields for the currently authenticated user's profile
 export async function updateMyProfile(profile, token) {
   const res = await fetch(`${BASE_URL}/api/users/me`, {
@@ -193,11 +209,21 @@ export async function updateMyProfile(profile, token) {
     throw new Error(body.error || `Could not update profile (${res.status})`);
   }
 
+  // Clear all user caches since profile changed
+  cache.userInfo = {};
+  cache.lastFetch = {};
+
   return res.json();
 }
 
 // Gets the logged-in users follower and following lists
 export async function getMyFollows(id, token) {
+const cacheKey = `userFollows_${id}`;
+  
+  if (cache.userFollows[id] && isCacheValid(cacheKey)) {
+    return cache.userFollows[id];
+  }
+
   const res = await fetch(`${BASE_URL}/api/users/me/follows/${id}`, {
     credentials: "include",
     headers: {
@@ -210,8 +236,10 @@ export async function getMyFollows(id, token) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Could not load follows (${res.status})`);
   }
-
-  return res.json();
+const data = await res.json();
+  cache.userFollows[id] = data;
+  cache.lastFetch[cacheKey] = Date.now();
+  return data;
 }
 
 // Follows another user by their user ID
@@ -229,6 +257,10 @@ export async function followUser(userId, token) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Could not follow user (${res.status})`);
   }
+
+  // Invalidate follow lists when they change
+  cache.userFollows = {};
+  cache.lastFetch = {};
 
   return res.json();
 }
@@ -249,11 +281,21 @@ export async function unfollowUser(userId, token) {
     throw new Error(body.error || `Could not unfollow user (${res.status})`);
   }
 
+  // Invalidate follow lists when they change
+  cache.userFollows = {};
+  cache.lastFetch = {};
+  
   return res.json();
 }
 
 //Get user name by id
 export async function whoAmI(id, token) {
+  const cacheKey = `userInfo_${id}`;
+  
+  if (cache.userInfo[id] && isCacheValid(cacheKey)) {
+    return cache.userInfo[id];
+  }
+
   const res = await fetch(`${BASE_URL}/api/users/whoAmI/${id}`, {
     credentials: "include",
     headers: {
@@ -266,6 +308,8 @@ export async function whoAmI(id, token) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Could not load username (${res.status})`);
   }
-
-  return res.json();
+const data = await res.json();
+  cache.userInfo[id] = data;
+  cache.lastFetch[cacheKey] = Date.now();
+  return data;
 }
