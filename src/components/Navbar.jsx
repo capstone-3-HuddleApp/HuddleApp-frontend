@@ -1,19 +1,20 @@
 import { NavLink, useLocation } from "react-router";
 import SearchBar from "./searchBar";
+import { SearchProvider } from "../../context/useSearchContext.jsx";
 
 /**
  * $$$-Funtion Creation: 08/09/2026, [Md Shamin Ahsan Anaph]
  * $$$-Most Recent Change: 08/09/2026, [Md Shamin Ahsan Anaph]
- * 
+ *
  * $$$-Method Description:
  *    Renders a responsive navigation header that adapts based on the current route.
  *    Displays different navigation layouts for authentication pages, protected routes,
  *    chat rooms, and profile pages. Handles user authentication state and logout functionality.
  *    Integrates SearchBar component for location and room filtering on specific routes.
- * 
+ *
  * $$$-Component Using This Function:
  *    App (main layout wrapper)
- * 
+ *
  * $$$-Description of Variables:
  *    - linkClass: CSS class generator for NavLink elements with active/inactive states
  *    - location: Current route pathname from useLocation hook
@@ -36,12 +37,12 @@ export default function Navbar({ user, onLogout, className = "" }) {
 
   let location = useLocation();
   let name;
-  if(user){
+  if (user) {
     name = user.username || "User";
-  }else{
-    name = "User"
+  } else {
+    name = "User";
   }
-  
+
   console.log(location.pathname);
 
   return (
@@ -110,15 +111,12 @@ export default function Navbar({ user, onLogout, className = "" }) {
           >
             HUDL
           </NavLink>
-
           <SearchBar></SearchBar>
         </nav>
       )}
 
-      {location.pathname === '/events/create' && (
-        <h1 className="text-3xl font-bold text-[#29272b]">
-        Create an event
-        </h1>
+      {location.pathname === "/events/create" && (
+        <h1 className="text-3xl font-bold text-[#29272b]">Create an event</h1>
       )}
 
       {/**Chat Room page: shows the logo and room/search filter */}

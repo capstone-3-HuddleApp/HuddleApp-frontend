@@ -1,7 +1,9 @@
 import FormField from "./FormField";
 import SelectField from "./SelectField";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import searchIcon from "../assets/interface_icons/search.svg";
+import { useSearch } from "../../context/useSearchContext";
+import { searchEvents } from "../api/events";
 
 /**
  * $$$-Funtion Creation: 08/09/2026, [Md Shamin Ahsan Anaph]
@@ -26,6 +28,7 @@ import searchIcon from "../assets/interface_icons/search.svg";
  *
  * */
 export default function SearchBar({searchPlaceholder='Search Events!', filterPlaceholder='Filter'}) {
+  const {setSearchResults, setSearchQuery} = useSearch();
   const [error, setError] = useState(null);
   const [value, setValue] = useState("")
 
@@ -36,9 +39,36 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
   { value: "entertainment", label: "Entertainment" },
 ];
 
-  function handleChange(e) {
-    setValue(e.value)
+ const handleSearch = async(value) =>{
+    const results = await searchEvents(value);
+    setSearchQuery(value)
+    setSearchResults(results)
   }
+
+  function handleChange(e) {
+    setValue(e.target.value)
+  }
+
+  // Debounce: wait 500ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (value.trim().length >= 2) {
+        try {
+          await handleSearch(value);
+          setError(null);
+        } catch (err) {
+          setError(err.message);
+        }
+      } else {
+      // Clear search results when input is empty or too short
+      setSearchResults([]);
+      setSearchQuery("");
+    }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [value]);
+
 
   return (
     <div className="flex min-h-11 w-full max-w-md items-center gap-2 rounded-full border border-[#d8cdb6] bg-[#fff9df]/70 px-4 focus-within:border-(--accent) focus-within:ring-2 focus-within:ring-(--accent)/20 [&_label]:sr-only">

@@ -49,10 +49,10 @@ export default function DiscoverPage({ user, geolocation, getLocation }) {
       try {
         await getLocation();
 
-        
         let allEvents = [];
         if (geolocation) {
-          allEvents = await getEvents(null,
+          allEvents = await getEvents(
+            null,
             geolocation.latitude,
             geolocation.longitude,
           );
@@ -137,11 +137,11 @@ export default function DiscoverPage({ user, geolocation, getLocation }) {
               </button>
             </div>
           </div>
+
           <RecEvents
             popularEvents={popularEvents}
             toggleSaved={toggleSaved}
           ></RecEvents>
-
           {/* saved events */}
           <SavedEvents savedEvents={savedEvents} toggleSaved={toggleSaved} />
 
