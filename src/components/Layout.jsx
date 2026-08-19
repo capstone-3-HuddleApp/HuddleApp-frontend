@@ -14,6 +14,7 @@ export default function Layout({ user, onLogout, authError }) {
   let location = useLocation();
 
 const [selectedCategory, setSelectedCategory] = useState("");
+console.log("layout:", selectedCategory)
 
   return (
     <div className="flex flex-col min-h-screen relative">
@@ -23,6 +24,8 @@ const [selectedCategory, setSelectedCategory] = useState("");
           className="fixed top-0 left-0 right-0 z-50 bg-[#fff9df]"
           user={user}
           onLogout={onLogout}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
         />
 
         {/* Scrollable Main (with padding for fixed elements) */}
@@ -37,7 +40,7 @@ const [selectedCategory, setSelectedCategory] = useState("");
               {authError}
             </p>
           )}
-          <Outlet />
+          <Outlet context={{selectedCategory}}/>
         </div>
       </SearchProvider>
 

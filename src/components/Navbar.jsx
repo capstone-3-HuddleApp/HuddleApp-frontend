@@ -43,7 +43,7 @@ export default function Navbar({ user, onLogout, className = "", selectedCategor
     name = "User";
   }
 
-  console.log(location.pathname);
+  console.log(selectedCategory);
 
   return (
     <header
@@ -138,6 +138,8 @@ export default function Navbar({ user, onLogout, className = "", selectedCategor
           <SearchBar
             searchPlaceholder="Search Rooms"
             filterPlaceholder="Filter"
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
           ></SearchBar>
         </nav>
       )}

@@ -98,6 +98,8 @@ export default function DiscoverPage({ user, geolocation, getLocation }) {
     ? events.filter((e) => e.category === selectedCategory)
     : events;
 
+    console.log(categoryFiltered)
+
   // popular events + fitltered events by zip code
   const popularEvents = confirmedZip
     ? categoryFiltered.filter((e) => e.zipcode === confirmedZip)
