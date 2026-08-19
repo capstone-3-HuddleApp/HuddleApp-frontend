@@ -1,4 +1,5 @@
 import { Outlet, useLocation } from "react-router";
+import { useState } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { SearchProvider } from "../../context/useSearchContext";
@@ -11,6 +12,8 @@ import { SearchProvider } from "../../context/useSearchContext";
 // here rather than on one page, because a broken login affects all of them.
 export default function Layout({ user, onLogout, authError }) {
   let location = useLocation();
+
+const [selectedCategory, setSelectedCategory] = useState("");
 
   return (
     <div className="flex flex-col min-h-screen relative">

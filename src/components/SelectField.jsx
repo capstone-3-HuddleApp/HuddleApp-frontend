@@ -39,7 +39,7 @@ export default function SelectField({
       >
         {/* Disabled placeholder — shown until the user picks something, but
             not itself a valid submission (required blocks it from staying). */}
-        <option value='' disabled>
+        <option value='' >
           {placeholder}
         </option>
 

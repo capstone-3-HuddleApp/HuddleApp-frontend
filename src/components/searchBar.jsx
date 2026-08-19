@@ -27,7 +27,7 @@ import { searchEvents } from "../api/events";
  *    - handleChange: Updates value state when user types in search or selects category
  *
  * */
-export default function SearchBar({searchPlaceholder='Search Events!', filterPlaceholder='Filter'}) {
+export default function SearchBar({searchPlaceholder='Search Events!', filterPlaceholder='Filter', selectedCategory, setSelectedCategory}) {
   const {setSearchResults, setSearchQuery} = useSearch();
   const [error, setError] = useState(null);
   const [value, setValue] = useState("")
@@ -47,6 +47,10 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
 
   function handleChange(e) {
     setValue(e.target.value)
+  }
+
+  function handleCategoryChange(e) {
+    setSelectedCategory(e.target.value);
   }
 
   // Debounce: wait 500ms after user stops typing
@@ -93,9 +97,9 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
       className="h-8 w-28 shrink-0 text-center appearance-none cursor-pointer rounded-full border border-[#d8cdb6] bg-[#ffe991] px-1 text-xs font-semibold text-[#29272b] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) [&_option]:bg-[#fff9df] [&_option]:text-[#29272b]"
       label=""
       aria-label={filterPlaceholder}
-      name="search_events"
-      value={value}
-      onChange={handleChange}
+      name="category_filter"
+      value={selectedCategory}
+      onChange={handleCategoryChange}
       error={error}
       options={CATEGORY_OPTIONS}
       placeholder={filterPlaceholder}
