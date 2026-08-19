@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router";
 // import { useAuth0 } from "@auth0/auth0-react";
 // import { getProtected } from "../api/auth";
 import { getEvents } from "../api/events";
@@ -33,7 +34,7 @@ export default function DiscoverPage({ user }) {
   const [eventsError, setEventsError] = useState(null);
 
   // filtering
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const { selectedCategory } = useOutletContext();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
 

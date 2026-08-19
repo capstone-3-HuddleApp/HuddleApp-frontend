@@ -1,4 +1,5 @@
 import { Outlet, useLocation } from "react-router";
+import { useState } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
@@ -11,6 +12,8 @@ import Footer from "./Footer";
 export default function Layout({ user, onLogout, authError }) {
 let location = useLocation()
 
+const [selectedCategory, setSelectedCategory] = useState("");
+
   return (
     <div className="flex flex-col min-h-screen relative">
       {/**Fixed top navbar */}
@@ -18,6 +21,9 @@ let location = useLocation()
         className="fixed top-0 left-0 right-0 z-50 bg-[#fff9df]"
         user={user}
         onLogout={onLogout}
+
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
       />
 
       {/* Scrollable Main (with padding for fixed elements) */}
@@ -30,7 +36,11 @@ let location = useLocation()
             {authError}
           </p>
         )}
-        <Outlet/>
+        <Outlet
+          context={{
+            selectedCategory,
+          }}
+        />
       </div>
 
       {/* Fixed Footer */}
