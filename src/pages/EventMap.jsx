@@ -148,33 +148,18 @@ export default function MapPage() {
 
     const fetchAllDataAndCoordinates = async () => {
       try {
-        const realEvents = await getEvents();
-        const updatedEvents = await Promise.all(
-          realEvents.map(async (event) => {
-            if (!event.zipcode) return event;
-            try {
-              const geoResponse = await fetch(
-                `https://nominatim.openstreetmap.org/search?postalcode=${event.zipcode}&country=US&format=json`,
-              );
-              const data = await geoResponse.json();
-              if (data && data.length > 0) {
-                return {
-                  ...event,
-                  coords: [parseFloat(data[0].lat), parseFloat(data[0].lon)],
-                };
-              }
-              return event;
-            } catch (error) {
-              console.error(
-                "Error fetching coordinates for event:",
-                event.name,
-                error,
-              );
-              return event;
-            }
-          }),
-        );
-        setEventsWithCoords(updatedEvents.filter((e) => e.coords));
+        const [userLatitude, userLongitude] = userLocation || [];
+        const realEvents = await getEvents(null, userLatitude, userLongitude);
+
+        // Events already have latitude/longitude from your DB
+        const eventsWithCoords = realEvents
+          .filter((e) => e.latitude && e.longitude)
+          .map((event) => ({
+            ...event,
+            coords: [parseFloat(event.latitude), parseFloat(event.longitude)],
+          }));
+
+        setEventsWithCoords(eventsWithCoords);
       } catch (error) {
         console.error("Error fetching events from API:", error);
       }
@@ -423,4 +408,3 @@ export default function MapPage() {
     </div>
   );
 }
-
