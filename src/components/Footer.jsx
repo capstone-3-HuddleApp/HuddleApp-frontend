@@ -48,7 +48,11 @@ export default function Footer({ user, className = "" }) {
   return (
     <>
       <footer
+<<<<<<< HEAD
+        className={`border-b border-(--border) bg-black border-2 border-b-blue-50 h-[10vh] relative z-3000 ${className}`}
+=======
         className={`border-b border-(--border) bg-[#ffe991] border-2 border-b-[#d8cdb6] h-[10vh] ${className}`}
+>>>>>>> d3a7975ec684d497fbc1176b6594823042e658bd
       >
         {!location.pathname.startsWith("/room/") && (
           <nav className="mx-auto flex flex-row max-w-3xl items-center justify-center-safe gap-2 px-4 py-3">

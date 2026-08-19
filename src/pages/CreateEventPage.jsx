@@ -207,6 +207,26 @@ export default function CreateEventPage({ user }) {
     setSuggestions([]);
   }
 
+  // AUTOMATIC MAP PREFILL LOGIC
+  // Checks memory when the page loads. If a facility was clicked on the map, 
+  // it parses the object and instantly fills the form!
+  // Added By Talha - 08/13/26
+  // =========================================================================
+  useEffect(() => {
+    const saved = sessionStorage.getItem("prefillFacility");
+    if (saved) {
+      try {
+        const facility = JSON.parse(saved);
+        handleSelectFacility(facility);
+      } catch (e) {
+        console.error("Failed to parse prefilled facility from map", e);
+      } finally {
+        // Clear it from memory so it doesn't auto-fill again if the user refreshes
+        sessionStorage.removeItem("prefillFacility");
+      }
+    }
+  }, []);
+
   // Returns an errors object; empty object means the form is valid.
   function validate() {
     const nextErrors = {};
