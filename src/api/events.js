@@ -11,7 +11,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 //In-memory Caching
 // Simple in-memory cache
 const cache = {
-  events: null,
+  events: {},
   myEvents: null,
   guestEvents: null,
   participatingEvents: {}, //Keyed by id
@@ -28,7 +28,7 @@ function isCacheValid(key) {
 }
 
 function clearCache() {
-  cache.events = null;
+  cache.events = {};
   cache.myEvents = null;
   cache.guestEvents = null;
   cache.participatingEvents = null;
@@ -36,28 +36,42 @@ function clearCache() {
   cache.lastFetch = {};
 }
 
-// READ ALL — GET /api/events. zipcode is optional; pass it to filter server-side.
-export async function getEvents(zipcode) {
+export async function getEvents(zipcode, latitude, longitude) {
+  // Generate unique cache key for each combination
+  let cacheKey = "events_all";
+  
   if (zipcode) {
-    return fetchEvents(zipcode);
+    cacheKey = `events_zip_${zipcode}`;
+  } else if (latitude && longitude) {
+    cacheKey = `events_loc_${latitude}_${longitude}`;
   }
 
-  if (cache.events && isCacheValid("events")) {
-    return cache.events;
+  // Check cache
+  if (cache.events[cacheKey] && isCacheValid(cacheKey)) {
+    console.log("events cache Hit")
+    return cache.events[cacheKey];
   }
 
-  const data = await fetchEvents();
-  cache.events = data;
-  cache.lastFetch.events = Date.now();
+  const data = await fetchEvents(zipcode, latitude, longitude);
+  cache.events[cacheKey] = data;
+  cache.lastFetch[cacheKey] = Date.now();
   return data;
 }
 
-async function fetchEvents(zipcode) {
-  const query = zipcode ? `?zipcode=${encodeURIComponent(zipcode)}` : "";
-  const res = await fetch(`${BASE_URL}/api/events${query}`, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-  });
+async function fetchEvents(zipcode, latitude, longitude) {
+  const query = new URLSearchParams();
+  if (zipcode) query.append("zipcode", encodeURIComponent(zipcode));
+  if (latitude) query.append("latitude", latitude);
+  if (longitude) query.append("longitude", longitude);
+
+  const queryString = query.toString();
+  const res = await fetch(
+    `${BASE_URL}/api/events${queryString ? "?" + queryString : ""}`,
+    {
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    },
+  );
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
