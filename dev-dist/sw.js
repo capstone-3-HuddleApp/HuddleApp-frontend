@@ -87,5 +87,13 @@ define(['./workbox-7e5eb42b'], (function (workbox) { 'use strict';
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
     allowlist: [/^\/$/]
   }));
+  workbox.registerRoute(/^http:\/\/localhost:8000\/api\/.*/, new workbox.NetworkOnly(), 'GET');
+  workbox.registerRoute(/^https:\/\/cloudinary\.com\/.*/i, new workbox.CacheFirst({
+    "cacheName": "images-cache",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 60,
+      maxAgeSeconds: 2592000
+    })]
+  }), 'GET');
 
 }));

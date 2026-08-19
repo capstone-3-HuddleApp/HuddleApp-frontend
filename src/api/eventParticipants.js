@@ -1,6 +1,15 @@
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+const cache = {UserAttendEvents: {}}
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+function isCacheValid(key) {
+  return (
+    cache.lastFetch[key] && Date.now() - cache.lastFetch[key] < CACHE_DURATION
+  );
+}
   /**
  * $$$-Funtion Creation: 08/08/2026, [Md Shamin Ahsan Anaph]
  * $$$-Most Recent Change: 08/08/2026, [Md Shamin Ahsan Anaph]
@@ -54,6 +63,12 @@ export async function getUserAttendEvents(userId) {
     throw new Error("Must include userId");
   }
   
+  const cacheKey = `userAttendEvents_${userId}`;
+  
+  if (cache.userAttendEvents?.[userId] && isCacheValid(cacheKey)) {
+    return cache.userAttendEvents[userId];
+  }
+  
   const res = await fetch(`${BASE_URL}/api/users/${userId}/events`, {
     method: "GET",
     credentials: "include",
@@ -65,5 +80,15 @@ export async function getUserAttendEvents(userId) {
     throw new Error(body.error || `Could not fetch events (${res.status})`);
   }
 
-  return res.json();
+  const data = await res.json();
+  
+  // Initialize userAttendEvents object if it doesn't exist
+  if (!cache.userAttendEvents) {
+    cache.userAttendEvents = {};
+  }
+  
+  cache.userAttendEvents[userId] = data;
+  cache.lastFetch[cacheKey] = Date.now();
+  
+  return data;
 }
