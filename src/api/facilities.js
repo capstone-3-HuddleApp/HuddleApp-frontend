@@ -30,6 +30,22 @@ function isCacheValid(key) {
 // relevant to the current query
 // params = { optype={Public}, facgroup={parks and plazas, libraries }, facsubgrp?, search? }
 export async function searchFacilities(params = {}) {
+  // If search param exists, don't cache — always fetch fresh
+  if (params.search) {
+    const res = await fetch(`${BASE_URL}/api/facilities`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || `Could not load facilities (${res.status})`);
+    }
+    return await res.json();
+  }
+  
   const paramKey = getParamKey(params);
 
   if (cache.facilities[paramKey] && isCacheValid(paramKey)) {

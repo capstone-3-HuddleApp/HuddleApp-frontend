@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EventCard from "./EventCard";
 import arrow from "../assets/interface_icons/arrow.svg";
+import { useSearch } from "../../context/useSearchContext.jsx";
 
 function RecEvents({ popularEvents, toggleSaved }) {
+  const [eventsToDisplay, setEventsToDisplay] = useState(popularEvents);
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
+  const {searchResults} = useSearch();
   const itemsPerPage = 6;
 
+// Sync eventsToDisplay with searchResults or popularEvents
+  useEffect(() => {
+    if (searchResults && searchResults.length > 0) {
+      setEventsToDisplay(searchResults);
+      setCurrentPage(0);
+    } else {
+      setEventsToDisplay(popularEvents);
+      setCurrentPage(0);
+    }
+  }, [searchResults, popularEvents]);
+
   const start = currentPage * itemsPerPage;
-  const paginatedEvents = popularEvents.slice(start, start + itemsPerPage);
-  const maxPages = Math.ceil(popularEvents.length / itemsPerPage);
+  const paginatedEvents = eventsToDisplay.slice(start, start + itemsPerPage);
+  const maxPages = Math.ceil(eventsToDisplay.length / itemsPerPage);
 
   const handleTouchStart = (e) => {
     setTouchStart(e.touches[0].clientX);
@@ -31,6 +45,7 @@ function RecEvents({ popularEvents, toggleSaved }) {
 
     setTouchStart(null);
   };
+
 
   return (
     <div

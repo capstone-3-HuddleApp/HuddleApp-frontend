@@ -10,7 +10,7 @@ import DiscoverPage from "./pages/DiscoverPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import GuestProfile from "./pages/GuestProfile";
-import UserProfile from './pages/UserProfile'
+import UserProfile from "./pages/UserProfile";
 import ChatRoom from "./pages/ChatRooms";
 import EventMap from "./pages/EventMap";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -46,8 +46,8 @@ function App() {
     logout: auth0Logout,
   } = useAuth0();
 
-  const [geolocation, setGeolocation] = useState(null);
-  const [guestId, setGuestId]= useState(null);
+  const [geolocation, setGeolocation] = useState({latitude: null, longitude:null});
+  const [guestId, setGuestId] = useState(null);
   // On a page refresh, THREE things can be in flight at once, and
   // ProtectedRoute must not redirect while any of them is still running —
   // otherwise a logged-in user gets bounced to /login every time they hit F5:
@@ -136,16 +136,25 @@ function App() {
   }
 
   const getLocation = () => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setGeolocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      },
-      (error) => console.error(error),
-    );
-  };
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const newLocation = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      };
+
+      // Only update if location has actually changed
+      if (
+        geolocation?.latitude !== newLocation.latitude ||
+        geolocation?.longitude !== newLocation.longitude
+      ) {
+        setGeolocation(newLocation);
+      }
+    },
+    (error) => console.error(error),
+    { maximumAge: 10*60*1000}
+  );
+};
 
   return (
     <Routes>
@@ -170,7 +179,11 @@ function App() {
           path="/discover"
           element={
             <ProtectedRoute user={user} isLoading={isLoading}>
-              <DiscoverPage user={user} />
+              <DiscoverPage
+                user={user}
+                geolocation={geolocation}
+                getLocation={getLocation}
+              />
             </ProtectedRoute>
           }
         />

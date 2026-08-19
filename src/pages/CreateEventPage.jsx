@@ -162,7 +162,7 @@ export default function CreateEventPage({ user }) {
       setIsSearching(true);
       setSearchError("");
 
-      console.log(location);
+      
 
       try {
         const facgroup = CATEGORY_TO_FACGROUP[formData.category];

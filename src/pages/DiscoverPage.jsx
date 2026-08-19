@@ -22,7 +22,7 @@ import SavedEvents from "../components/SavedEvents";
 //
 // The backend's requireAuth accepts either, which is why ONE endpoint serves
 // both. Look at `via` in the response to see which door you came through.
-export default function DiscoverPage({ user }) {
+export default function DiscoverPage({ user, geolocation, getLocation }) {
   // const { isAuthenticated: isAuth0User, getAccessTokenSilently } = useAuth0();
   // const [result, setResult] = useState(null);
   // const [error, setError] = useState(null);
@@ -48,7 +48,19 @@ export default function DiscoverPage({ user }) {
   useEffect(() => {
     async function loadAllEvents() {
       try {
-        const allEvents = await getEvents();
+        await getLocation();
+
+        let allEvents = [];
+        if (geolocation) {
+          allEvents = await getEvents(
+            null,
+            geolocation.latitude,
+            geolocation.longitude,
+          );
+        } else {
+          allEvents = await getEvents();
+        }
+
         setAllEvents(allEvents);
       } catch (err) {
         setEventsError(err.message);
@@ -57,7 +69,7 @@ export default function DiscoverPage({ user }) {
       }
     }
     loadAllEvents();
-  }, []);
+  }, [geolocation]);
 
   function toggleSaved(id) {
     setAllEvents(
@@ -126,11 +138,11 @@ export default function DiscoverPage({ user }) {
               </button>
             </div>
           </div>
+
           <RecEvents
             popularEvents={popularEvents}
             toggleSaved={toggleSaved}
           ></RecEvents>
-
           {/* saved events */}
           <SavedEvents savedEvents={savedEvents} toggleSaved={toggleSaved} />
 
