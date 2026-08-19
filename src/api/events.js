@@ -36,6 +36,27 @@ function clearCache() {
   cache.lastFetch = {};
 }
 
+export async function searchEvents(query) {
+  const trimedQuery = query.trim()
+  if (!query || trimedQuery.length < 2) {
+    throw new Error('Search term must be at least 2 characters');
+  }
+
+  const res = await fetch(`${BASE_URL}/api/events/search`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: trimedQuery}),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not search events (${res.status})`);
+  }
+
+  return res.json();
+}
+
 export async function getEvents(zipcode, latitude, longitude) {
   // Generate unique cache key for each combination
   let cacheKey = "events_all";
