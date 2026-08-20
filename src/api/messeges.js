@@ -52,7 +52,19 @@ export async function postMessage(eventId, userId, messageText) {
       credentials: "include",
       body: JSON.stringify({ eventId, userId, content: messageText }),
     });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || `Could not send message (${res.status})`);
+    }
     const savedMessage = await res.json();
+
+    // Keep the room cache synchronized so reopening the chat includes this message.
+    const cachedMessages = cache.messages[eventId] || [];
+    if (!cachedMessages.some((message) => message.id === savedMessage.id)) {
+      cache.messages[eventId] = [...cachedMessages, savedMessage];
+    }
+    cache.lastFetch[`messages_${eventId}`] = Date.now();
+
     console.log(savedMessage);
     return savedMessage;
   } catch (err) {

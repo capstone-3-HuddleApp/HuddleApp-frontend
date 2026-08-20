@@ -26,6 +26,7 @@ export default function Footer({ user, className = "" }) {
   let location = useLocation();
   const { eventId } = useParams();
   const [input, setInput] = useState("");
+  const [sendError, setSendError] = useState("");
   const { sendMessage } = useSendMessage(eventId, user?.id);
 
   //Repeating styles grouped together
@@ -35,12 +36,17 @@ export default function Footer({ user, className = "" }) {
     "flex items-center w-10 h-10 border-2 border-[#d18a32] bg-[#f8d8aa] rounded-none rotate-45 p-2";
   const footerTextClass = "font-bold text-xs";
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    sendMessage(input); // Call the hook's sendMessage
-    setInput(""); // Clear input
+    try {
+      setSendError("");
+      await sendMessage(input);
+      setInput("");
+    } catch (error) {
+      setSendError(error.message || "Message could not be sent");
+    }
   };
 
   console.log(location.pathname);
@@ -48,7 +54,7 @@ export default function Footer({ user, className = "" }) {
   return (
     <>
       <footer
-        className={`border-b border-(--border) bg-[#ffe991] border-2 border-b-[#d8cdb6] h-[10vh] ${className}`}
+        className={`h-20 border-2 border-b border-(--border) border-b-[#d8cdb6] bg-[#ffe991] ${className}`}
       >
         {!location.pathname.startsWith("/room/") && (
           <nav className="mx-auto flex flex-row max-w-3xl items-center justify-center-safe gap-2 px-4 py-3">
@@ -112,7 +118,15 @@ export default function Footer({ user, className = "" }) {
         )}
 
         {location.pathname.startsWith("/room/") && (
-          <section className="mt-4 flex min-h-11 w-full max-w-md items-center gap-2 rounded-full border border-[#d8cdb6] bg-[#fff9df]/70 px-4 focus-within:border-(--accent) focus-within:ring-2 focus-within:ring-(--accent)/20 [&_label]:sr-only">
+          <section className="relative mx-auto mt-4 flex min-h-11 w-[94%] items-center gap-2 rounded-full border border-[#d8cdb6] bg-[#fff9df]/70 px-4 focus-within:border-(--accent) focus-within:ring-2 focus-within:ring-(--accent)/20 sm:w-[80%] [&_label]:sr-only">
+            {sendError && (
+              <p
+                role="alert"
+                className="absolute right-2 bottom-full left-2 mb-2 rounded-lg border border-[#e89a87] bg-[#f9c9b8] px-3 py-2 text-center text-xs font-semibold text-[#7d2f24]"
+              >
+                {sendError}
+              </p>
+            )}
             <FormField
               id="message"
               name="message"

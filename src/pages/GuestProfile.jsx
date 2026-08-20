@@ -2,7 +2,7 @@ import ProfileHeader from "../components/ProfileHeader";
 import ProfileStats from "../components/ProfileStats";
 
 import ProfileEventHistory from "../components/Profile/ProfileEventHistory";
-
+import ProfileFollowList from "../components/Profile/ProfileFollowList";
 import { useEffect, useState } from "react";
 import { getGuestEvents } from "../api/events";
 import { getMyFollows} from "../api/auth";
@@ -21,6 +21,7 @@ import { getMyFollows} from "../api/auth";
  */
 export default function GuestProfile({
   user,
+  setGuestId,
   getAccessToken,
 }) {
 
@@ -39,6 +40,8 @@ export default function GuestProfile({
   const [followsLoading, setFollowsLoading] = useState(true);
   const [followsError, setFollowsError] = useState("");
 
+    // Remembers which follow list the visitor opened on this guest profile.
+  const [openFollowList, setOpenFollowList] = useState(null);
 
   // Loads the events that the guest user has joined when the profile opens
   useEffect(() => {
@@ -74,7 +77,7 @@ export default function GuestProfile({
     return () => {
       ignoreResult = true;
     };
-  }, []);
+  }, [user]);
 
 
 
@@ -121,6 +124,11 @@ export default function GuestProfile({
     (event) => new Date(event.time) < new Date(),
   );
 
+  // Separates the guest user's current and upcoming created events.
+  const currentEvents = joinedEvents.filter(
+    (event) => new Date(event.time) >= new Date(),
+  );
+
 
 
 
@@ -145,6 +153,25 @@ export default function GuestProfile({
         eventsCount={
           eventsLoading || eventsError ? undefined : joinedEvents.length
         }
+        onFollowersClick={() =>
+          setOpenFollowList((currentList) =>
+            currentList === "followers" ? null : "followers",
+          )
+        }
+        onFollowingClick={() =>
+          setOpenFollowList((currentList) =>
+            currentList === "following" ? null : "following",
+          )
+        }
+      />
+
+      {/* Displays the selected guest user's Followers or Following list. */}
+      <ProfileFollowList
+        openFollowList={openFollowList}
+        followers={followData.followers ?? []}
+        following={followData.following ?? []}
+        onPersonClick={setGuestId}
+        onClose={() => setOpenFollowList(null)}
       />
 
       {/* Displays completed events from the logged-in user's joined-event data */}
@@ -152,6 +179,9 @@ export default function GuestProfile({
         eventsLoading={eventsLoading}
         eventsError={eventsError}
         pastEvents={pastEvents}
+        participatingEvents={currentEvents}
+        currentDescription="Current and upcoming events created by this organizer."
+        historyDescription="Past events created by this organizer."
       />
     </main>
   );
