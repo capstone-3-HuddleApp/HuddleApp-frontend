@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import EventBottomSheet from "../components/mapComponents/EventBottomSheet";
 import {
   MapContainer,
   TileLayer,
   Marker,
   Popup,
-  Circle,
-  useMap,
   useMapEvents,
 } from "react-leaflet";
 import { useNavigate } from "react-router";
@@ -27,16 +26,31 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-// Pink Icon for the User's Location
-const pinkUserIcon = new L.Icon({
-  iconUrl:
-    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+// Animated Pink Icon for the User's Location (Bouncing Pin + Pulsing Radar)
+const animatedUserIcon = new L.divIcon({
+  // Clear out Leaflet's default white box styling
+  className: "bg-transparent border-none",
+  html: `
+    <div class="relative flex flex-col items-center justify-end w-12.5 h-17.5">
+      
+      <!-- The bouncing pin -->
+      <img 
+        src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png" 
+        class="relative z-10 w-6.25 h-10.25 animate-bounce" 
+        style="animation-duration: 1.2s;"
+      />
+      
+      <!-- The pulsing radar circle on the ground -->
+      <div class="absolute bottom-2 w-6 h-6 bg-fuchsia-500 rounded-full animate-ping opacity-75"></div>
+      
+      <!-- Static tiny shadow so it looks like it's floating -->
+      <div class="absolute bottom-1 w-4 h-1 bg-black/40 rounded-[100%] blur-[1px]"></div>
+      
+    </div>
+  `,
+  iconSize: [50, 70],
+  iconAnchor: [25, 65], // Anchors the bottom of the shadow to your true coordinate
+  popupAnchor: [0, -60],
 });
 
 // Green Icon for the facilities
@@ -80,27 +94,6 @@ function getDistanceInMiles(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-// CRASH-PROOF AUTO-ZOOM COMPONENT
-function MapBounds({ center, radiusInMeters }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (center && center.length === 2 && radiusInMeters > 0) {
-      try {
-        const bounds = L.latLng(center[0], center[1]).toBounds(
-          radiusInMeters * 2,
-        );
-        map.fitBounds(bounds, { animate: true, padding: [40, 40] });
-      } catch (error) {
-        console.error("Error setting map bounds:", error);
-      }
-    }
-  }, [map, center, radiusInMeters]);
-
-  return null;
-}
-
-// Tracks both Zoom AND the physical corners of the screen
 // Tracks both Zoom AND the physical corners of the screen
 function MapStateTracker({ onMapChange }) {
   const map = useMapEvents({
@@ -118,20 +111,19 @@ function MapStateTracker({ onMapChange }) {
   // Set the initial bounds as soon as the map loads
   useEffect(() => {
     onMapChange(map.getZoom(), map.getBounds());
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map]); // <--- THE FIX: We removed onMapChange from this dependency array!
+  }, [map]); 
 
   return null;
 }
 
 export default function MapPage() {
   const navigate = useNavigate();
+  const mapRef = useRef(null); // <--- NEW: Gives us direct control of the camera
 
   const [userLocation, setUserLocation] = useState([40.7128, -74.006]);
   const [eventsWithCoords, setEventsWithCoords] = useState([]);
   const [facilitiesWithCoords, setFacilitiesWithCoords] = useState([]);
-  const [radiusInput, setRadiusInput] = useState("");
 
   const [currentZoom, setCurrentZoom] = useState(11);
   const [currentBounds, setCurrentBounds] = useState(null);
@@ -152,7 +144,6 @@ export default function MapPage() {
         const [userLatitude, userLongitude] = userLocation || [];
         const realEvents = await getEvents(null, userLatitude, userLongitude);
 
-        // Events already have latitude/longitude from your DB
         const eventsWithCoords = realEvents
           .filter((e) => e.latitude && e.longitude)
           .map((event) => ({
@@ -196,34 +187,7 @@ export default function MapPage() {
     fetchAllDataAndCoordinates();
   }, []);
 
-  const activeRadius = radiusInput === "" ? 2 : Number(radiusInput);
-  const isFiltering = radiusInput !== "";
-
-  const filteredEvents = isFiltering
-    ? eventsWithCoords.filter((event) => {
-        const distance = getDistanceInMiles(
-          userLocation[0],
-          userLocation[1],
-          event.coords[0],
-          event.coords[1],
-        );
-        return distance <= activeRadius;
-      })
-    : eventsWithCoords;
-
-  const filteredFacilities = isFiltering
-    ? facilitiesWithCoords.filter((facility) => {
-        const distance = getDistanceInMiles(
-          userLocation[0],
-          userLocation[1],
-          facility.coords[0],
-          facility.coords[1],
-        );
-        return distance <= activeRadius;
-      })
-    : facilitiesWithCoords;
-
-  const visibleFacilities = filteredFacilities.filter((facility) => {
+  const visibleFacilities = facilitiesWithCoords.filter((facility) => {
     if (!currentBounds) return false;
     return currentBounds.contains(
       L.latLng(facility.coords[0], facility.coords[1]),
@@ -231,43 +195,51 @@ export default function MapPage() {
   });
 
   return (
-    <div className="fixed top-25 left-0 right-0 bottom-25 z-0 overflow-hidden bg-[#fff9df] [&_.leaflet-top.leaflet-left]:top-10">
-      {/* SEARCH RADIUS BOX */}
-      <div className="absolute top-14 right-4 z-1000 w-56 rounded-lg border border-[#d8cdb6] bg-[#fff9df] p-3 shadow-lg">
-        <label className="block text-sm font-bold text-gray-700 mb-2">
-          Search Radius (Miles):
-        </label>
-        <input
-          type="number"
-          min="0"
-          step="0.1"
-          value={radiusInput}
-          onChange={(e) => setRadiusInput(e.target.value)}
-          className="w-full bg-[#fff9df] border border-[#d8cdb6] text-[#29272b] text-sm rounded-md focus:ring-[#f2a451] focus:border-[#f2a451] block p-2"
-          placeholder="e.g. 10 (blank for all)"
-        />
+    <div className="fixed top-25 left-0 right-0 bottom-25 z-0 overflow-hidden bg-[#fff9df] [&_.leaflet-top.leaflet-left]:top-16">
+      
+      {/* THE NEW FLOATING TOGGLE BUTTONS (ACTS AS LEGEND & AUTO-ZOOM) */}
+      <div className="absolute top-4 left-0 right-0 z-1000 flex justify-center gap-3 pointer-events-none px-4">
+        <button
+          onClick={() => {
+            if (mapRef.current) {
+              // Swoops out to level 12 to show all events
+              mapRef.current.flyTo(userLocation, 12, { animate: true });
+            }
+          }}
+          className="pointer-events-auto flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-lg font-bold text-sm border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition"
+        >
+          🔵 Events
+        </button>
+
+        <button
+          onClick={() => {
+            if (mapRef.current) {
+              // Swoops in to level 15 to automatically reveal green facilities
+              mapRef.current.flyTo(userLocation, 15, { animate: true });
+            }
+          }}
+          className="pointer-events-auto flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-lg font-bold text-sm border-2 border-green-500 text-green-600 hover:bg-green-50 transition"
+        >
+          🌳 Facilities
+        </button>
       </div>
 
       <MapContainer
+        ref={mapRef} // <--- NEW: Attaches our controller to the map
         style={{ height: "100%", width: "100%" }}
         center={userLocation}
         zoom={11}
+        zoomControl={false} // Clean up default zoom controls to let our buttons shine
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <MapBounds
-          center={userLocation}
-          radiusInMeters={activeRadius * 1609.34}
-        />
-
         {/* LISTENS FOR YOU PINCHING OR CLICKING THE MAP */}
         <MapStateTracker
           onMapChange={(zoom, bounds) => {
             if (zoom === "click") {
-              // FIX: Clicking empty map clears everything!
               setSelectedEvent(null);
               setSelectedFacility(null);
               sessionStorage.removeItem("prefillFacilityAddress");
@@ -279,29 +251,18 @@ export default function MapPage() {
         />
 
         {/* USER LOCATION */}
-        <Marker position={userLocation} icon={pinkUserIcon}>
+        <Marker position={userLocation} icon={animatedUserIcon}>
           <Popup>You are here!</Popup>
         </Marker>
 
-        <Circle
-          center={userLocation}
-          radius={activeRadius * 1609.34}
-          pathOptions={{
-            color: "#3b82f6",
-            fillColor: "red",
-            fillOpacity: 0.2,
-          }}
-        />
-
         {/* EVENT MARKERS (BLUE) */}
-        {filteredEvents.map((event) => (
+        {eventsWithCoords.map((event) => (
           <Marker
             key={`event-${event.id}`}
             position={event.coords}
             eventHandlers={{
               click: () => {
                 setSelectedEvent(event);
-                // FIX: Clear facility selection if user clicks an event
                 setSelectedFacility(null);
                 sessionStorage.removeItem("prefillFacilityAddress");
               },
@@ -312,7 +273,6 @@ export default function MapPage() {
         {/* FACILITY MARKERS (GREEN OR RED) */}
         {currentZoom >= 15 &&
           visibleFacilities.map((facility) => {
-            // FIX: Check if this facility is the active one
             const isSelected =
               selectedFacility &&
               (selectedFacility.uid || selectedFacility.id) ===
@@ -326,9 +286,8 @@ export default function MapPage() {
                 eventHandlers={{
                   click: () => {
                     setSelectedFacility(facility);
-                    setSelectedEvent(null); // Hide event popup if it's open
+                    setSelectedEvent(null);
 
-                    // Save the address (or name) to memory for the Create Event page!
                     const addressToSave =
                       facility.address || facility.facname || "";
                     sessionStorage.setItem(
