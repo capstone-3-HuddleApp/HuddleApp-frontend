@@ -55,8 +55,8 @@ export default function DiscoverPage({ user, geolocation, getLocation }) {
         if (geolocation) {
           allEvents = await getEvents(
             null,
-            geolocation.latitude,
             geolocation.longitude,
+            geolocation.latitude,
           );
         } else {
           allEvents = await getEvents();
