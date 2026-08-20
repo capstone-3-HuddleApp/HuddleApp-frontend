@@ -51,8 +51,8 @@ export default function DiscoverPage({ geolocation, getLocation }) {
         if (geolocation) {
           allEvents = await getEvents(
             null,
-            geolocation.latitude,
             geolocation.longitude,
+            geolocation.latitude,
           );
         } else {
           allEvents = await getEvents();
@@ -90,24 +90,31 @@ export default function DiscoverPage({ geolocation, getLocation }) {
     setConfirmedZip(zipInput.trim());
   }
 
+  // Helper function to separate current and past events
+  function filterEventsByTime(events) {
+    const now = new Date();
+    return {
+      currentEvents: events.filter((e) => new Date(e.time) >= now),
+      pastEvents: events.filter((e) => new Date(e.time) < now),
+    };
+  }
+
   // shows all events or just picked category
   const categoryFiltered = selectedCategory
     ? events.filter((e) => e.category === selectedCategory)
     : events;
 
-    console.log(categoryFiltered)
+  console.log(categoryFiltered);
 
   // popular events + fitltered events by zip code
   const popularEvents = confirmedZip
     ? categoryFiltered.filter((e) => e.zipcode === confirmedZip)
     : categoryFiltered;
 
-  // bookmarked events
-  const savedEvents = categoryFiltered.filter((e) => e.saved);
+  const { currentEvents, pastEvents } = filterEventsByTime(popularEvents);
 
-  const pastEvents = categoryFiltered.filter(
-    (e) => new Date(e.time) < new Date(),
-  );
+  // bookmarked events
+  const savedEvents = currentEvents.filter((e) => e.saved);
 
   return (
     <main className="mx-auto w-full max-w-5xl pb-28 pt-4 sm:pt-6">
@@ -147,8 +154,12 @@ export default function DiscoverPage({ geolocation, getLocation }) {
             </div>
 
           <RecEvents
-            popularEvents={popularEvents}
+            popularEvents={currentEvents}
             toggleSaved={toggleSaved}
+            geolocation={geolocation}
+            zipInput={zipInput}
+            setZipInput={setZipInput}
+            handleZipConfirm={handleZipConfirm}
           ></RecEvents>
           </section>
           {/* saved events */}
