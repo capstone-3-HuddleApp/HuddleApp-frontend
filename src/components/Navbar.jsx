@@ -1,6 +1,5 @@
 import { NavLink, useLocation } from "react-router";
 import SearchBar from "./searchBar";
-import { SearchProvider } from "../../context/useSearchContext.jsx";
 
 /**
  * $$$-Funtion Creation: 08/09/2026, [Md Shamin Ahsan Anaph]
@@ -29,7 +28,7 @@ import { SearchProvider } from "../../context/useSearchContext.jsx";
  *      4. /profile: User name display + Log out button
  *
  * */
-export default function Navbar({ user, onLogout, className = "", selectedCategory, setSelectedCategory }) {
+export default function Navbar({ user, onLogout, className = "", selectedCategory, setSelectedCategory, onRoomSearchChange }) {
   const linkClass = ({ isActive }) =>
     `px-3 py-2 rounded-md text-sm font-medium ${
       isActive ? "text-(--accent)" : "hover:text-(--text-h)"
@@ -47,7 +46,7 @@ export default function Navbar({ user, onLogout, className = "", selectedCategor
 
   return (
     <header
-      className={`min-h-[8vh] w-full border-b border-(--border) ${className}`}
+      className={`${location.pathname.startsWith("/room/") ? "min-h-14" : location.pathname.startsWith("/events/") && location.pathname !== "/events/create" ? "min-h-16" : "min-h-20"} w-full border-b border-(--border) ${className}`}
     >
       {/* Auth pages: Display login/signup links or logout button*/}
       {(location.pathname === "/login" || location.pathname === "/signup") && (
@@ -120,7 +119,35 @@ export default function Navbar({ user, onLogout, className = "", selectedCategor
       )}
 
       {location.pathname === "/events/create" && (
-        <h1 className="text-3xl font-bold text-[#29272b]">Create an event</h1>
+        <div className="mx-auto flex min-h-20 max-w-6xl items-center justify-center px-4 py-3 sm:px-6">
+          <h1 className="text-2xl font-extrabold text-[#29272b] sm:text-3xl">
+            {location.state?.editEvent ? "Edit event" : "Create an event"}
+          </h1>
+        </div>
+      )}
+
+      {location.pathname === "/map" && (
+        <div className="mx-auto flex min-h-20 max-w-6xl items-center justify-center px-4 py-3 sm:px-6">
+          <div className="text-center">
+            <h1 className="text-2xl font-extrabold text-[#29272b]">Explore Map</h1>
+            <p className="text-xs text-[#7d8794]">Find events and public spaces near you.</p>
+          </div>
+        </div>
+      )}
+
+      {location.pathname.startsWith("/events/") && location.pathname !== "/events/create" && (
+        <nav className="relative mx-auto flex h-16 max-w-6xl items-center justify-center px-4 sm:px-6">
+          <NavLink
+            to="/discover"
+            className="absolute left-4 rounded-full border border-[#df8b2f] bg-[#f2b6bd] px-3 py-1.5 text-sm font-bold text-[#62383d] shadow-sm transition hover:bg-[#ed9fa9] sm:left-6"
+          >
+            Back
+          </NavLink>
+          <div className="text-center">
+            <h1 className="text-xl font-extrabold text-[#29272b] sm:text-2xl">Event Details</h1>
+            <p className="hidden text-xs text-[#7d8794] sm:block">Everything you need to HUDL up.</p>
+          </div>
+        </nav>
       )}
 
       {/**Chat Room page: shows the logo and room/search filter */}
@@ -140,19 +167,39 @@ export default function Navbar({ user, onLogout, className = "", selectedCategor
             filterPlaceholder="Filter"
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
+            localOnly
+            onLocalSearchChange={onRoomSearchChange}
           ></SearchBar>
+        </nav>
+      )}
+
+      {location.pathname.startsWith("/room/") && (
+        <nav className="relative mx-auto flex min-h-14 max-w-6xl items-center justify-center px-4 py-1 sm:px-6">
+          <NavLink
+            to="/chat-rooms"
+            className="absolute left-4 shrink-0 rounded-full border border-[#c97f88] bg-[#f2b6bd] px-3 py-1.5 text-sm font-bold text-[#62383d] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#e98e9a] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c97f88] sm:left-6"
+            aria-label="Return to chat rooms"
+          >
+            Back
+          </NavLink>
+          <div className="min-w-0 max-w-[55%] text-center sm:max-w-[70%]">
+            <h1 className="truncate text-lg font-extrabold text-(--text-h)">
+              {location.state?.eventName || "Event chat"}
+            </h1>
+            <p className="text-xs text-(--text)">Group conversation</p>
+          </div>
         </nav>
       )}
 
       {/**user Profile: Display user name and logout button */}
       {location.pathname === "/profile" && (
-        <nav className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
-          <h1 className="min-w-0 flex-1 truncate text-xl font-extrabold tracking-tight text-[#29272b]">
+        <nav className="relative mx-auto flex min-h-20 max-w-6xl items-center justify-center px-4 py-3 sm:px-6">
+          <h1 className="max-w-[50%] truncate text-center text-xl font-extrabold tracking-tight text-[#29272b]">
             {name}
           </h1>
           <button
             onClick={onLogout}
-            className="shrink-0 cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-(--text) transition hover:text-(--text-h) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+            className="absolute right-4 cursor-pointer rounded-full border border-[#df8b2f] bg-[#f2a451] px-4 py-2 text-sm font-bold text-[#29272b] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#e8943e] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) sm:right-6"
           >
             Log out
           </button>

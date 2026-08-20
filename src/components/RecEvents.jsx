@@ -11,26 +11,23 @@ function RecEvents({
   setZipInput,
   handleZipConfirm,
 }) {
-  const [eventsToDisplay, setEventsToDisplay] = useState(popularEvents);
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
   const { searchResults } = useSearch();
   const itemsPerPage = 6;
 
-  // Sync eventsToDisplay with searchResults or popularEvents
+  // Determine which events to display
+  const eventsToDisplay = searchResults?.length > 0 ? searchResults : popularEvents;
+
+  // Reset to page 0 when search results or popular events change
   useEffect(() => {
-    if (searchResults && searchResults.length > 0) {
-      setEventsToDisplay(searchResults);
-      setCurrentPage(0);
-    } else {
-      setEventsToDisplay(popularEvents);
-      setCurrentPage(0);
-    }
+    setCurrentPage(0);
   }, [searchResults, popularEvents]);
 
-  const start = currentPage * itemsPerPage;
+  const maxPages = Math.max(1, Math.ceil(eventsToDisplay.length / itemsPerPage));
+  const safePage = Math.min(currentPage, maxPages - 1);
+  const start = safePage * itemsPerPage;
   const paginatedEvents = eventsToDisplay.slice(start, start + itemsPerPage);
-  const maxPages = Math.ceil(eventsToDisplay.length / itemsPerPage);
 
   const handleTouchStart = (e) => {
     setTouchStart(e.touches[0].clientX);
@@ -43,10 +40,8 @@ function RecEvents({
     const distance = touchStart - touchEnd;
 
     if (distance > 50) {
-      // Swiped left
       setCurrentPage((prev) => (prev + 1) % maxPages);
     } else if (distance < -50) {
-      // Swiped right
       setCurrentPage((prev) => (prev - 1 + maxPages) % maxPages);
     }
 
@@ -55,19 +50,18 @@ function RecEvents({
 
   return (
     <div
-      className="mb-4 md:flex md:flex-col"
+      className="mb-2 mt-4"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* popular events + zip code filter */}
       <div className="flex items-center justify-between mb-2">
-        <h2 className="">
-    {searchResults && searchResults.length > 0
-      ? "Search Results"
-      : geolocation?.latitude
-      ? "Events near you"
-      : "Popular Events"}
-  </h2>
+        <h2>
+          {searchResults && searchResults.length > 0
+            ? "Search Results"
+            : geolocation?.latitude
+            ? "Events near you"
+            : "Popular Events"}
+        </h2>
 
         {!searchResults?.length && !geolocation?.latitude && (
           <div className="flex items-center gap-1 text-xs">
@@ -87,6 +81,7 @@ function RecEvents({
           </div>
         )}
       </div>
+
       <div className="w-full h-full grid grid-cols-2 grid-rows-3 lg:grid-cols-3 gap-3 flex-1 sm:w-[80vw]">
         {paginatedEvents.map((event) => (
           <EventCard
@@ -96,7 +91,8 @@ function RecEvents({
           />
         ))}
       </div>
-      <section className="lg:flex w-full items-center justify-between mt-2">
+
+      <section className="mt-2 flex w-full items-center justify-center">
         <button
           onClick={() =>
             setCurrentPage((prev) => (prev - 1 + maxPages) % maxPages)
@@ -105,13 +101,13 @@ function RecEvents({
         >
           <img className="rotate-180 size-10" src={arrow} alt="prev" />
         </button>
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="mt-4 flex justify-center gap-2">
           {Array.from({ length: maxPages }).map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentPage(index)}
               className={`w-2 h-2 rounded-full transition-all ${
-                currentPage === index ? "bg-yellow-500" : "bg-amber-300"
+                safePage === index ? "bg-yellow-500" : "bg-amber-300"
               }`}
             />
           ))}
@@ -120,7 +116,7 @@ function RecEvents({
           onClick={() => setCurrentPage((prev) => (prev + 1) % maxPages)}
           className="shrink-0 hidden"
         >
-          <img className="size-10 " src={arrow} alt="next" />
+          <img className="size-10" src={arrow} alt="next" />
         </button>
       </section>
     </div>

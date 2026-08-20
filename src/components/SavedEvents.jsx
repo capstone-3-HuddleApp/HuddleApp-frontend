@@ -34,7 +34,6 @@ function SavedEvents({ savedEvents, toggleSaved }) {
 
   return (
     <div>
-      <h2>Saved Events</h2>
       <div
         className="mb-4"
         onTouchStart={handleTouchStart}
@@ -49,7 +48,7 @@ function SavedEvents({ savedEvents, toggleSaved }) {
             />
           ))}
         </div>
-        <section className="lg:flex w-full items-center justify-between mt-2">
+        <section className="mt-2 flex w-full items-center justify-center">
           <button
             onClick={() =>
               setCurrentPage((prev) => (prev - 1 + maxPages) % maxPages)
@@ -58,7 +57,7 @@ function SavedEvents({ savedEvents, toggleSaved }) {
           >
             <img className="rotate-180 size-10" src={arrow} alt="prev" />
           </button>
-          <div className="flex justify-center gap-2 mt-4">
+          <div className="mt-4 flex justify-center gap-2">
             {Array.from({ length: maxPages }).map((_, index) => (
               <button
                 key={index}

@@ -4,11 +4,11 @@
 // each a single object keyed by field name, so one onChange handler and one
 // validate function cover all seven fields instead of one state pair per field.
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import FormField from "../components/FormField";
 import ImageUpload from "../components/ImageUpload";
 import SelectField from "../components/SelectField";
-import { createEvent } from "../api/events";
+import { createEvent, deleteEvent, updateEvent } from "../api/events";
 import { searchFacilities } from "../api/facilities";
 import { uploadImage } from "../api/images";
 
@@ -54,6 +54,9 @@ function toDateTimeLocal(date) {
 
 export default function CreateEventPage({ user }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const editEvent = location.state?.editEvent || null;
+  const isEditMode = Boolean(editEvent && editEvent.creator_id === user.id);
 
   // File states
   const [file, setFile] = useState(null);
@@ -84,17 +87,19 @@ export default function CreateEventPage({ user }) {
 
   // Move the ImageUpload component into your form
 
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    category: "",
-    time: toDateTimeLocal(new Date()),
-    location: "",
-    address: "",
-    zipcode: "",
-    maxParticipants: 99999,
-    facilities_id: "",
-  });
+  const [formData, setFormData] = useState(() => ({
+    name: isEditMode ? editEvent.name || "" : "",
+    description: isEditMode ? editEvent.description || "" : "",
+    category: isEditMode ? editEvent.category || "" : "",
+    time: isEditMode && editEvent.time
+      ? toDateTimeLocal(new Date(editEvent.time))
+      : toDateTimeLocal(new Date()),
+    location: isEditMode ? editEvent.location || "" : "",
+    address: isEditMode ? editEvent.address || "" : "",
+    zipcode: isEditMode ? editEvent.zipcode || "" : "",
+    maxParticipants: isEditMode ? editEvent.maxParticipants || 99999 : 99999,
+    facilities_id: isEditMode ? editEvent.facilities_id || "" : "",
+  }));
 
   // Per-field validation messages, shown by each FormField's own error prop.
   const [errors, setErrors] = useState({});
@@ -103,6 +108,8 @@ export default function CreateEventPage({ user }) {
   // rejection) go here instead — shown once, above the form.
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Results from the last successful search, shown as a dropdown under the
   // address field. Empty array = no dropdown rendered.
@@ -114,7 +121,7 @@ export default function CreateEventPage({ user }) {
   // skip re-searching immediately after a user picks a suggestion — without
   // this, setting formData.location on selection would re-trigger the same
   // debounced search a moment later for no reason.
-  const selectedLocationRef = useRef("");
+  const selectedLocationRef = useRef(isEditMode ? editEvent.location || "" : "");
 
   // Guards against a slow earlier request overwriting a faster later one.
   // Each search call gets an id; a response is only applied if its id still
@@ -213,6 +220,8 @@ export default function CreateEventPage({ user }) {
   // Added By Talha - 08/13/26
   // =========================================================================
   useEffect(() => {
+    if (isEditMode) return;
+
     const saved = sessionStorage.getItem("prefillFacility");
     if (saved) {
       try {
@@ -225,13 +234,13 @@ export default function CreateEventPage({ user }) {
         sessionStorage.removeItem("prefillFacility");
       }
     }
-  }, []);
+  }, [isEditMode]);
 
   // Returns an errors object; empty object means the form is valid.
   function validate() {
     const nextErrors = {};
     for (const field of REQUIRED_FIELDS) {
-      if (!formData[field].trim()) {
+      if (!String(formData[field]).trim()) {
         nextErrors[field] = "This field is required.";
       }
     }
@@ -256,10 +265,13 @@ export default function CreateEventPage({ user }) {
       // description is optional — send undefined instead of '' so the
       // backend's `if (!name || ...)` style checks don't see an empty string
       // as "provided but blank."
-      const event = await createEvent({
+      const eventData = {
         ...formData,
         description: formData.description.trim() || undefined,
-      });
+      };
+      const event = isEditMode
+        ? await updateEvent(editEvent.id, eventData)
+        : await createEvent(eventData);
 
       //upload the image after creating the event
       if (file) {
@@ -274,13 +286,29 @@ export default function CreateEventPage({ user }) {
     }
   }
 
+  async function handleDeleteEvent() {
+    if (!isEditMode) return;
+
+    setIsDeleting(true);
+    setSubmitError("");
+    try {
+      await deleteEvent(editEvent.id);
+      navigate("/discover", { replace: true });
+    } catch (err) {
+      setSubmitError(err.message);
+      setShowDeleteConfirmation(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
-    <div className="mx-auto max-w-md pt-5">
+    <main className="mx-auto w-full max-w-xl pb-28 pt-5">
 
       {submitError && (
         <p
           role="alert"
-          className="mb-6 rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-500"
+          className="mb-5 rounded-xl border border-[#e89a87] bg-[#f9c9b8] px-4 py-3 text-center text-sm font-semibold text-[#7d2f24]"
         >
           {submitError}
         </p>
@@ -288,7 +316,7 @@ export default function CreateEventPage({ user }) {
 
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-4 p-5 border-2 rounded-3xl"
+        className="flex flex-col gap-5 rounded-3xl border border-[#e4a24d] bg-[#f8d8aa] p-5 shadow-[0_18px_45px_rgba(104,72,38,0.28)] sm:p-7"
       >
         <FormField
           label="Event name*"
@@ -299,7 +327,7 @@ export default function CreateEventPage({ user }) {
           required
         />
 
-        <span className="flex flex-row gap-1">
+        <span className="grid grid-cols-[minmax(0,0.75fr)_minmax(0,1.75fr)] gap-3">
           <SelectField
             label="Category*"
             name="category"
@@ -368,7 +396,7 @@ export default function CreateEventPage({ user }) {
           )}
         </div>
 
-        <span className="flex flex-row gap-1 items-start w-full">
+        <span className="grid w-full grid-cols-[minmax(0,1.7fr)_minmax(0,0.8fr)] items-start gap-3">
           <FormField
             label="Address*"
             name="address"
@@ -380,7 +408,7 @@ export default function CreateEventPage({ user }) {
           />
 
           <FormField
-            className="w-[30%]"
+            className="w-full"
             label="Zip code*"
             name="zipcode"
             value={formData.zipcode}
@@ -399,9 +427,9 @@ export default function CreateEventPage({ user }) {
           error={errors.description}
         />
 
-        <span className="flex flex-row gap-1">
+        <span className="grid grid-cols-2 gap-3">
           <FormField
-          className="w-[60%]"
+          className="w-full"
           label="Max Participants"
           name="maxParticipants"
           value={formData.maxParticipants}
@@ -412,7 +440,7 @@ export default function CreateEventPage({ user }) {
 
         {/*Add image to the event */}
         <ImageUpload
-          className=""
+          className="w-full"
           label="Event Photo"
           name="eventPhoto"
           onChange={handleFileChange}
@@ -437,11 +465,35 @@ export default function CreateEventPage({ user }) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-2 rounded-xl bg-[#f2a451] py-3 text-sm font-semibold text-[#29272b] transition hover:bg-[#e8943e] disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-2 rounded-xl border border-[#df8b2f] bg-gradient-to-r from-[#ffe991] to-[#f2a451] py-3.5 text-sm font-extrabold text-[#29272b] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSubmitting ? "Creating…" : "Create event"}
+          {isSubmitting
+            ? isEditMode ? "Saving..." : "Creating..."
+            : isEditMode ? "Save changes" : "Create event"}
         </button>
+        {isEditMode && (
+          <button
+            type="button"
+            onClick={() => setShowDeleteConfirmation(true)}
+            className="rounded-xl border border-[#c97f88] bg-[#f2b6bd] py-3.5 text-sm font-extrabold text-[#62383d] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#e98e9a] hover:shadow-md"
+          >
+            Delete event
+          </button>
+        )}
       </form>
-    </div>
+
+      {showDeleteConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4">
+          <section role="dialog" aria-modal="true" aria-labelledby="delete-event-title" className="w-full max-w-sm rounded-3xl border border-[#e4a24d] bg-[#f8d8aa] p-6 text-center shadow-2xl">
+            <h2 id="delete-event-title" className="text-2xl font-extrabold text-[#29272b]">Delete this event?</h2>
+            <p className="mt-3 text-sm text-[#596579]">This permanently removes the event for everyone and cannot be undone.</p>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <button type="button" onClick={() => setShowDeleteConfirmation(false)} disabled={isDeleting} className="rounded-xl border border-[#d8cdb6] bg-[#fff9df] px-4 py-3 font-bold text-[#29272b]">Keep event</button>
+              <button type="button" onClick={handleDeleteEvent} disabled={isDeleting} className="rounded-xl border border-[#b85f6b] bg-[#e98e9a] px-4 py-3 font-bold text-[#50252b] disabled:opacity-60">{isDeleting ? "Deleting..." : "Delete"}</button>
+            </div>
+          </section>
+        </div>
+      )}
+    </main>
   );
 }

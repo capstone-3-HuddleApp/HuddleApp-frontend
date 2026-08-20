@@ -2,6 +2,7 @@ import ProfileHeader from "../components/ProfileHeader";
 import ProfileStats from "../components/ProfileStats";
 import ProfileEditSection from "../components/Profile/ProfileEditSection";
 import ProfileEventHistory from "../components/Profile/ProfileEventHistory";
+import ProfileFollowList from "../components/Profile/ProfileFollowList";
 import ProfileAccountSettings from "../components/Profile/ProfileAccountSettings";
 import UsernameWarningModal from "../components/Profile/UsernameWarning";
 import { useEffect, useState } from "react";
@@ -24,6 +25,7 @@ export default function UserProfile({
   user,
   setUser,
   getAccessToken,
+  setGuestId,
   getLocation,
   geolocation,
 }) {
@@ -38,7 +40,9 @@ export default function UserProfile({
   // Stores temporary username edits without changing the logged-in account
   const [draftUsername, setDraftUsername] = useState(user.username);
   // Remembers whether the public profile should show the display name or username
-  const [publicNameChoice, setPublicNameChoice] = useState("displayName");
+  const [publicNameChoice, setPublicNameChoice] = useState(
+    user.publicNameChoice ?? "displayName",
+  );
   // Tracks the logged-in user's joined events and their request status
   const [joinedEvents, setJoinedEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
@@ -51,6 +55,8 @@ export default function UserProfile({
   });
   const [followsLoading, setFollowsLoading] = useState(true);
   const [followsError, setFollowsError] = useState("");
+  // Remembers wether the followers list, following list, or niether is open
+  const [openFollowList, setOpenFollowList] = useState(null);
 
   // Tracks the profile-save request and its user-facing result
   const [isSaving, setIsSaving] = useState(false);
@@ -159,6 +165,11 @@ export default function UserProfile({
     (event) => new Date(event.time) < new Date(),
   );
 
+  // keeps upcoming joined events seperate for the current events sldier
+  const currentEventsParticipating = joinedEvents.filter(
+    (event)=> new Date(event.time) > new Date(),
+  );
+
   // Discards unsaved edits and closes the owner-only editor
   function handleCancelEdit() {
     const originalDisplayName =
@@ -168,7 +179,7 @@ export default function UserProfile({
 
     setDraftDisplayName(originalDisplayName);
     setDraftUsername(user.username);
-    setPublicNameChoice("displayName");
+    setPublicNameChoice(user.publicNameChoice ?? "displayName");
     setIsEditing(false);
     setShowUsernameWarning(false);
   }
@@ -204,7 +215,7 @@ export default function UserProfile({
       setIsSaving(true);
 
       const token = getAccessToken ? await getAccessToken() : undefined;
-      const updatedUser = await updateMyProfile({ name, username }, token);
+      const updatedUser = await updateMyProfile({ name, username, publicNameChoice }, token);
 
       setUser(updatedUser);
       setDraftDisplayName(updatedUser.name);
@@ -272,13 +283,32 @@ export default function UserProfile({
         eventsCount={
           eventsLoading || eventsError ? undefined : joinedEvents.length
         }
+        onFollowersClick={()=>
+          setOpenFollowList((currentList)=>
+            currentList === "followers" ? null : "followers",
+          )
+        }
+        onFollowingClick={()=>
+          setOpenFollowList((currentList)=>
+            currentList === "following" ? null : "following",
+          )
+        }
+      />
+      {/* Displays the selected Followers or Following list below the profile totals */}
+      <ProfileFollowList
+        openFollowList={openFollowList}
+        followers={followData.followers ?? []}
+        following={followData.following ?? []}
+        onClose={() => setOpenFollowList(null)}
+        onPersonClick={setGuestId}
       />
 
       {/* Displays completed events from the logged-in user's joined-event data */}
       <ProfileEventHistory
         eventsLoading={eventsLoading}
         eventsError={eventsError}
-        participatingEvents={pastEventsParticipated}
+        participatingEvents={currentEventsParticipating}
+        pastEvents={pastEventsParticipated}
       />
 
       {/* Keeps private account tools separate from what the public will see on profile page */}
