@@ -243,6 +243,7 @@ function App() {
             <ProtectedRoute user={user} isLoading={isLoading}>
               <GuestProfile
                 user={guestId}
+                setGuestId={setGuestId}
                 setUser={setUser}
                 getAccessToken={isAuth0User ? getAccessTokenSilently : null}
                 getLocation={getLocation}
@@ -259,6 +260,7 @@ function App() {
               <UserProfile
                 user={user}
                 setUser={setUser}
+                setGuestId={setGuestId}
                 getAccessToken={isAuth0User ? getAccessTokenSilently : null}
                 getLocation={getLocation}
                 geolocation={geolocation}

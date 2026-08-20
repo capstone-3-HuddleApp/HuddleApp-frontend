@@ -27,7 +27,7 @@ import { searchEvents } from "../api/events";
  *    - handleChange: Updates value state when user types in search or selects category
  *
  * */
-export default function SearchBar({searchPlaceholder='Search Events!', filterPlaceholder='Filter', selectedCategory, setSelectedCategory}) {
+export default function SearchBar({searchPlaceholder='Search Events!', filterPlaceholder='Filter', selectedCategory, setSelectedCategory, localOnly = false, onLocalSearchChange}) {
   const {setSearchResults, setSearchQuery} = useSearch();
   const [error, setError] = useState(null);
   const [value, setValue] = useState("")
@@ -39,14 +39,14 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
   { value: "entertainment", label: "Entertainment" },
 ];
 
- const handleSearch = async(value) =>{
-    const results = await searchEvents(value);
-    setSearchQuery(value)
-    setSearchResults(results)
-  }
-
   function handleChange(e) {
-    setValue(e.target.value)
+    const nextValue = e.target.value;
+    setValue(nextValue);
+
+    if (localOnly) {
+      onLocalSearchChange?.(nextValue);
+      setError(null);
+    }
   }
 
   function handleCategoryChange(e) {
@@ -55,10 +55,16 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
 
   // Debounce: wait 500ms after user stops typing
   useEffect(() => {
+    if (localOnly) {
+      return;
+    }
+
     const timer = setTimeout(async () => {
       if (value.trim().length >= 2) {
         try {
-          await handleSearch(value);
+          const results = await searchEvents(value);
+          setSearchQuery(value);
+          setSearchResults(results);
           setError(null);
         } catch (err) {
           setError(err.message);
@@ -71,7 +77,7 @@ export default function SearchBar({searchPlaceholder='Search Events!', filterPla
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [value]);
+  }, [value, localOnly, setSearchQuery, setSearchResults]);
 
 
   return (

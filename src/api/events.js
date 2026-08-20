@@ -13,7 +13,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const cache = {
   events: {},
   myEvents: null,
-  guestEvents: null,
+  guestEvents: {},
   participatingEvents: {}, //Keyed by id
   eventDetails: {}, // keyed by id
   lastFetch: {}, // track when each was fetched
@@ -30,10 +30,14 @@ function isCacheValid(key) {
 function clearCache() {
   cache.events = {};
   cache.myEvents = null;
-  cache.guestEvents = null;
+  cache.guestEvents = {};
   cache.participatingEvents = null;
   cache.eventDetails = {};
   cache.lastFetch = {};
+}
+
+export function invalidateEventCache() {
+  clearCache();
 }
 
 export async function searchEvents(query) {

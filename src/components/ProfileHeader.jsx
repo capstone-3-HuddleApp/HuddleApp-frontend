@@ -4,28 +4,49 @@ import { useState, useEffect } from "react";
 // Displays the public identity shared by the owner's and visitor's profiles.
 export default function ProfileHeader({ profile, action }) {
   const [images, setImages] = useState([]);
-  const fullName =
+  const displayName =
     profile?.name ||
     [profile?.f_name, profile?.l_name].filter(Boolean).join(" ") ||
     profile?.username;
 
+  const publicName =
+    profile?.publicNameChoice === "username"
+      ? profile?.username
+      : displayName;
+
   console.log(profile);
 
-  useEffect(() => {
-    if(!profile) return
-    const fetchImages = async () => {
+    useEffect(() => {
+    if (!profile?.id) {
+      setImages([]);
+      return;
+    }
+
+    let ignoreResult = false;
+    setImages([]);
+
+    async function fetchImages() {
       try {
         const fetchedImages = await GetProfileImg(profile.id);
-        setImages(fetchedImages);
+
+        if (!ignoreResult) {
+          setImages(fetchedImages);
+        }
       } catch (error) {
-        console.error(error);
+        if (!ignoreResult) {
+          console.error(error);
+        }
       }
-    };
+    }
 
     fetchImages();
-  }, [profile]);
 
-  const profileInitial = fullName?.charAt(0).toUpperCase();
+    return () => {
+      ignoreResult = true;
+    };
+  }, [profile?.id]);
+
+  const profileInitial = publicName?.charAt(0).toUpperCase();
   // Uses a responsive card that stacks on phones and becomes a row on larger screens.
   return (
     <section className="flex flex-col items-center gap-4 rounded-3xl border border-[#d8cdb6] bg-[#f8d8aa] p-5 text-center shadow-xl sm:flex-row sm:p-6 sm:text-left">
@@ -44,7 +65,7 @@ export default function ProfileHeader({ profile, action }) {
       {/* Displays the selected public name with the unique username underneath. */}
       <div className="min-w-0">
         <h1 className="wrap-break-word text-2xl font-extrabold text-(--text-h) sm:text-3xl">
-          {fullName}
+          {publicName}
         </h1>
         <p className="mt-1 break-all text-sm text-(--text) sm:text-base">
           @{profile.username}

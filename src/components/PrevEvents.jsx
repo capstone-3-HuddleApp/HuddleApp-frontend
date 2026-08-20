@@ -5,7 +5,7 @@ import arrow from "../assets/interface_icons/arrow.svg";
 function RecEvents({ popularEvents, toggleSaved }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
-  const itemsPerPage = 2;
+  const itemsPerPage = 6;
 
   const start = currentPage * itemsPerPage;
   const paginatedEvents = popularEvents.slice(start, start + itemsPerPage);
@@ -34,11 +34,11 @@ function RecEvents({ popularEvents, toggleSaved }) {
 
   return (
     <div
-      className="mb-2 mt-4 md:flex md:flex-col"
+      className="mb-2 mt-4"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="w-full h-full grid grid-cols-2 grid-rows-2 lg:grid-cols-3 gap-3 flex-1 sm:w-[80vw]">
+      <div className="grid w-full grid-cols-2 gap-3 lg:grid-cols-3">
         {paginatedEvents.map((event) => (
           <EventCard
             key={event.id}
@@ -47,7 +47,7 @@ function RecEvents({ popularEvents, toggleSaved }) {
           />
         ))}
       </div>
-      <section className="lg:flex w-full items-center justify-between mt-2">
+      <section className="mt-2 flex w-full items-center justify-center">
         <button
           onClick={() =>
             setCurrentPage((prev) => (prev - 1 + maxPages) % maxPages)
@@ -56,7 +56,7 @@ function RecEvents({ popularEvents, toggleSaved }) {
         >
           <img className="rotate-180 size-10" src={arrow} alt="prev" />
         </button>
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="mt-4 flex justify-center gap-2">
           {Array.from({ length: maxPages }).map((_, index) => (
             <button
               key={index}

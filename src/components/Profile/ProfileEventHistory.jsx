@@ -13,18 +13,50 @@ export default function ProfileEventHistory({
   eventsLoading,
   eventsError,
   pastEvents,
-  participatingEvents=null,
+  participatingEvents= [],
+  currentDescription = "Events you are currently attending.",
+  historyDescription = "Events you joined in the past.",
 }) {
   return (
-    
-    (
-      pastEvents && <section className="mt-5 rounded-2xl border border-[#d8cdb6] bg-[#f8d8aa] p-5 sm:p-6">
+    <>
+    {/*  Shows current and upcoming events the user is attending  */}
+    <section className="mt-5 rounded-2xl border border-[#d8cdb6] bg-[#f8d8aa] p-5 sm:p-6">
+      <div>
+        <h2 className="text-xl font-extrabold text-(--text-h) sm:text-2xl">
+          Current Events
+        </h2>
+
+        <p className="mt-1 text-sm text-(--text)">
+          {currentDescription}
+        </p>
+      </div>
+
+    {eventsLoading ? (
+      <p className="mt-5 text-center text-sm text-(--text)">
+        Loading current events...
+      </p>
+    ) : eventsError ? (
+      <p role="alert" className="mt-5 text-center text-sm text-red-600">
+        {eventsError}
+      </p>
+    ) : participatingEvents.length === 0 ? (
+      <p className="mt-5 text-center text-sm text-(--text)">
+        No current events to show yet.
+      </p>
+    ) : (
+      <PrevEvents popularEvents={participatingEvents}/>
+    )}
+
+    </section>
+
+    {
+      (pastEvents && <section className="mt-5 rounded-2xl border border-[#d8cdb6] bg-[#f8d8aa] p-5 sm:p-6">
       <div>
         <h2 className="text-xl font-extrabold text-(--text-h) sm:text-2xl">
           Event history
         </h2>
         <p className="mt-1 text-sm text-(--text)">
-          Events you Created in the past.
+          {historyDescription}
         </p>
       </div>
 
@@ -45,24 +77,11 @@ export default function ProfileEventHistory({
           No past events to show yet.
         </p>
       ) : (
-        <ul className="mt-5 space-y-3">
-          {pastEvents.map((event) => (
-            <li
-              key={event.id}
-              className="rounded-xl border border-[#d8cdb6] bg-[#fff9df]/50 px-4 py-3"
-            >
-              <h3 className="font-bold text-(--text-h)">{event.name}</h3>
-              <p className="mt-1 text-sm text-(--text)">
-                {new Date(event.time).toLocaleDateString()}
-              </p>
-            </li>
-          ))}
-        </ul>
+        <PrevEvents popularEvents={pastEvents} />
       )}
     </section>
-    ),
+    )}
 
-    (participatingEvents && <PrevEvents popularEvents={participatingEvents}></PrevEvents>)
-
+   </>
   );
 }

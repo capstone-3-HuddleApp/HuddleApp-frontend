@@ -1,7 +1,7 @@
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-const cache = {UserAttendEvents: {}}
+const cache = { userAttendEvents: {}, lastFetch: {} };
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
@@ -91,4 +91,24 @@ export async function getUserAttendEvents(userId) {
   cache.lastFetch[cacheKey] = Date.now();
   
   return data;
+}
+
+export async function removeUserFromEvent(userId, eventId) {
+  if (!userId || !eventId) {
+    throw new Error("Must include userId and eventId");
+  }
+
+  const res = await fetch(`${BASE_URL}/api/users/${userId}/events/${eventId}`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Could not leave event (${res.status})`);
+  }
+
+  delete cache.userAttendEvents[userId];
+  delete cache.lastFetch[`userAttendEvents_${userId}`];
 }

@@ -14,6 +14,7 @@ export default function Layout({ user, onLogout, authError }) {
   let location = useLocation();
 
 const [selectedCategory, setSelectedCategory] = useState("");
+const [roomSearchQuery, setRoomSearchQuery] = useState("");
 console.log("layout:", selectedCategory)
 
   return (
@@ -26,11 +27,18 @@ console.log("layout:", selectedCategory)
           onLogout={onLogout}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
+          onRoomSearchChange={setRoomSearchQuery}
         />
 
         {/* Scrollable Main (with padding for fixed elements) */}
         <div
-          className={`w-full flex-1 px-4 pt-1 mt-20 mb-20 overflow-y-hidden ${location.pathname.startsWith("/room/") ? "flex flex-col-reverse" : ""}`}
+          className={`w-full flex-1 mb-20 overflow-y-hidden ${
+            location.pathname.startsWith("/room/")
+              ? "mt-14 flex min-h-0 flex-col px-0"
+              : location.pathname.startsWith("/events/") && location.pathname !== "/events/create"
+                ? "mt-16 px-3 pt-4 sm:px-6 sm:pt-6"
+                : "mt-20 px-4 pt-1"
+          }`}
         >
           {authError && (
             <p
@@ -40,7 +48,7 @@ console.log("layout:", selectedCategory)
               {authError}
             </p>
           )}
-          <Outlet context={{selectedCategory}}/>
+          <Outlet context={{selectedCategory, roomSearchQuery}}/>
         </div>
       </SearchProvider>
 

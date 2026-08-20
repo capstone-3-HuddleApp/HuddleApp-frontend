@@ -230,9 +230,9 @@ export default function MapPage() {
   });
 
   return (
-    <div className="fixed top-25 left-0 right-0 bottom-25 z-0 overflow-hidden bg-[#fff9df]">
+    <div className="fixed top-25 left-0 right-0 bottom-25 z-0 overflow-hidden bg-[#fff9df] [&_.leaflet-top.leaflet-left]:top-10">
       {/* SEARCH RADIUS BOX */}
-      <div className="absolute top-4 right-4 z-1000 bg-white p-3 rounded-lg shadow-lg border border-gray-200 w-56">
+      <div className="absolute top-14 right-4 z-1000 w-56 rounded-lg border border-[#d8cdb6] bg-[#fff9df] p-3 shadow-lg">
         <label className="block text-sm font-bold text-gray-700 mb-2">
           Search Radius (Miles):
         </label>
