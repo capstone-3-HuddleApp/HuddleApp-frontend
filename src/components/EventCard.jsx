@@ -5,9 +5,9 @@ import review from "../assets/interface_icons/comment-alt.svg";
 import { GetEventImg } from "../api/images";
 
 // displays one event (popular, saved, and past events)
-function EventCard({ event, onBookmarkToggle, variant }) {
+function EventCard({ event, onBookmarkToggle}) {
   const [images, setImages] = useState([]);
-  const isPast = variant === "past"; // "past" swaps the bookmark icon for to "Write a review" link
+  const isPast = new Date(event.time) < new Date(); // "past" swaps the bookmark icon for to "Write a review" link and grays out the event
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -24,7 +24,9 @@ function EventCard({ event, onBookmarkToggle, variant }) {
 
   return (
     <Link
-      className="relative h-[20vh] md:h-80 rounded-3xl border border-white/20 bg-[#211d30] shadow-2xl shadow-black/20 w-full flex flex-col items-center justify-end overflow-hidden"
+      className={`relative h-[20vh] md:h-80 rounded-3xl border border-white/20 bg-[#211d30] shadow-2xl shadow-black/20 w-full flex flex-col items-center justify-end overflow-hidden ${
+        isPast ? "opacity-60 grayscale" : ""
+      }`}
       to={`/events/${event.id}`}
     >
       <img
