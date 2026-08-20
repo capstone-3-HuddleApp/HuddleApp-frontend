@@ -7,6 +7,7 @@ import { getEvents } from "../api/events";
 import EventCard from "../components/EventCard";
 import RecEvents from "../components/RecEvents";
 import SavedEvents from "../components/SavedEvents";
+import PastEvents from "../components/PastEvents";
 
 // A page to TEST the protected backend endpoint. ProtectedRoute makes sure you
 // can only get here when logged in; the button then calls /api/protected and
@@ -93,24 +94,31 @@ export default function DiscoverPage({ user, geolocation, getLocation }) {
     setConfirmedZip(zipInput.trim());
   }
 
+  // Helper function to separate current and past events
+  function filterEventsByTime(events) {
+    const now = new Date();
+    return {
+      currentEvents: events.filter((e) => new Date(e.time) >= now),
+      pastEvents: events.filter((e) => new Date(e.time) < now),
+    };
+  }
+
   // shows all events or just picked category
   const categoryFiltered = selectedCategory
     ? events.filter((e) => e.category === selectedCategory)
     : events;
 
-    console.log(categoryFiltered)
+  console.log(categoryFiltered);
 
   // popular events + fitltered events by zip code
   const popularEvents = confirmedZip
     ? categoryFiltered.filter((e) => e.zipcode === confirmedZip)
     : categoryFiltered;
 
-  // bookmarked events
-  const savedEvents = categoryFiltered.filter((e) => e.saved);
+  const { currentEvents, pastEvents } = filterEventsByTime(popularEvents);
 
-  const pastEvents = categoryFiltered.filter(
-    (e) => new Date(e.time) < new Date(),
-  );
+  // bookmarked events
+  const savedEvents = currentEvents.filter((e) => e.saved);
 
   return (
     <>
@@ -119,42 +127,20 @@ export default function DiscoverPage({ user, geolocation, getLocation }) {
 
       {!loadEvents && !eventsError && (
         <>
-          {/* popular events + zip code */}
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="">
-              {confirmedZip ? "Popular Events near you" : "Popular Events"}
-            </h2>
-            <div className="flex items-center gap-1 text-xs">
-              <span>Zip Code:</span>
-              <input
-                type="text"
-                value={zipInput}
-                onChange={(e) => setZipInput(e.target.value)}
-                className="border rounded px-2 py-1 w-20"
-              />
-              <button
-                onClick={handleZipConfirm}
-                className="border rounded px-2 py-1"
-              >
-                Enter
-              </button>
-            </div>
-          </div>
-
+          
           <RecEvents
-            popularEvents={popularEvents}
+            popularEvents={currentEvents}
             toggleSaved={toggleSaved}
+            geolocation={geolocation}
+            zipInput={zipInput}
+            setZipInput={setZipInput}
+            handleZipConfirm={handleZipConfirm}
           ></RecEvents>
           {/* saved events */}
           <SavedEvents savedEvents={savedEvents} toggleSaved={toggleSaved} />
 
           {/* past events */}
-          <h2 className="">Past Events</h2>
-          <div className="grid grid-cols-2 gap-2 mb-20">
-            {pastEvents.map((event) => (
-              <EventCard key={event.id} event={event} variant="past" />
-            ))}
-          </div>
+          <PastEvents pastEvents={pastEvents}></PastEvents>
         </>
       )}
     </>
