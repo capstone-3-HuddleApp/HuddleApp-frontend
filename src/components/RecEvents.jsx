@@ -17,14 +17,18 @@ function RecEvents({
   const itemsPerPage = 6;
 
   // Determine which events to display
-  const eventsToDisplay = searchResults?.length > 0 ? searchResults : popularEvents;
+  const eventsToDisplay =
+    searchResults?.length > 0 ? searchResults : popularEvents;
 
   // Reset to page 0 when search results or popular events change
   useEffect(() => {
     setCurrentPage(0);
   }, [searchResults, popularEvents]);
 
-  const maxPages = Math.max(1, Math.ceil(eventsToDisplay.length / itemsPerPage));
+  const maxPages = Math.max(
+    1,
+    Math.ceil(eventsToDisplay.length / itemsPerPage),
+  );
   const safePage = Math.min(currentPage, maxPages - 1);
   const start = safePage * itemsPerPage;
   const paginatedEvents = eventsToDisplay.slice(start, start + itemsPerPage);
@@ -54,30 +58,40 @@ function RecEvents({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="flex items-center justify-between mb-2">
-        <h2>
-          {searchResults && searchResults.length > 0
-            ? "Search Results"
-            : geolocation?.latitude
-            ? "Events near you"
-            : "Popular Events"}
-        </h2>
+      <div className="flex flex-col items-center justify-between mb-2">
+        <div className="mb-4">
+          <div>
+            <h2 className="text-xl font-extrabold text-[#29272b] sm:text-2xl">
+              {searchResults && searchResults.length > 0
+                ? "Search Results"
+                : geolocation?.latitude
+                  ? "Events near you"
+                  : "Popular Events"}
+            </h2>
+            <p className="mt-1 text-sm text-[#7d8794]">
+              Discover something new in your community.
+            </p>
+          </div>
+        </div>
 
         {!searchResults?.length && !geolocation?.latitude && (
-          <div className="flex items-center gap-1 text-xs">
-            <span>Zip Code:</span>
-            <input
-              type="text"
-              value={zipInput}
-              onChange={(e) => setZipInput(e.target.value)}
-              className="border rounded px-2 py-1 w-20"
-            />
-            <button
-              onClick={handleZipConfirm}
-              className="border rounded px-2 py-1"
-            >
-              Enter
-            </button>
+          <div className="flex justify-end px-1">
+            <div className="flex items-center gap-2 rounded-2xl border border-[#d8cdb6] bg-[#fff9df]/90 p-2 text-xs font-semibold text-[#566474] shadow-[0_8px_20px_rgba(104,72,38,0.14)]">
+              <label htmlFor="discover-zipcode">Zip Code:</label>
+              <input
+                id="discover-zipcode"
+                type="text"
+                value={zipInput}
+                onChange={(e) => setZipInput(e.target.value)}
+                className="w-20 rounded-lg border border-[#d8cdb6] bg-[#fff9df] px-2 py-2 text-[#29272b] outline-none focus:border-[#f2a451] focus:ring-2 focus:ring-[#f2a451]/20"
+              />
+              <button
+                onClick={handleZipConfirm}
+                className="rounded-lg border border-[#df8b2f] bg-[#ffe991] px-3 py-2 font-bold text-[#29272b] transition hover:bg-[#ffdf6b]"
+              >
+                Enter
+              </button>
+            </div>
           </div>
         )}
       </div>

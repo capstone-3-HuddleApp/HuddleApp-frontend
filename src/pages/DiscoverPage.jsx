@@ -123,35 +123,9 @@ export default function DiscoverPage({ geolocation, getLocation }) {
 
       {!loadEvents && !eventsError && (
         <div className="space-y-5">
-          <div className="flex justify-end px-1">
-            <div className="flex items-center gap-2 rounded-2xl border border-[#d8cdb6] bg-[#fff9df]/90 p-2 text-xs font-semibold text-[#566474] shadow-[0_8px_20px_rgba(104,72,38,0.14)]">
-              <label htmlFor="discover-zipcode">Zip Code:</label>
-              <input
-                id="discover-zipcode"
-                type="text"
-                value={zipInput}
-                onChange={(e) => setZipInput(e.target.value)}
-                className="w-20 rounded-lg border border-[#d8cdb6] bg-[#fff9df] px-2 py-2 text-[#29272b] outline-none focus:border-[#f2a451] focus:ring-2 focus:ring-[#f2a451]/20"
-              />
-              <button
-                onClick={handleZipConfirm}
-                className="rounded-lg border border-[#df8b2f] bg-[#ffe991] px-3 py-2 font-bold text-[#29272b] transition hover:bg-[#ffdf6b]"
-              >
-                Enter
-              </button>
-            </div>
-          </div>
-
+       
           {/* popular events + zip code */}
           <section className="rounded-2xl border border-[#d8cdb6] bg-[#f8d8aa] p-4 shadow-sm sm:p-6">
-            <div className="mb-4">
-              <div>
-                <h2 className="text-xl font-extrabold text-[#29272b] sm:text-2xl">
-                  {confirmedZip ? "Popular Events near you" : "Popular Events"}
-                </h2>
-                <p className="mt-1 text-sm text-[#7d8794]">Discover something new in your community.</p>
-              </div>
-            </div>
 
           <RecEvents
             popularEvents={currentEvents}
